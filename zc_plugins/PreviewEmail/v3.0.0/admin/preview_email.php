@@ -159,13 +159,19 @@ $previewEmailFormAction = zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL');
 .pe-status .pe-bad{color:#a40000;font-weight:bold}
 .pe-group{margin:0 0 22px}
 .pe-group h2{font-size:1.1em;margin:0 0 6px;padding-bottom:4px;border-bottom:1px solid #d8dee4}
-.pe-table{width:100%;border-collapse:collapse;font-size:13px}
+/* One table per group, so every table gets the same fixed column widths;
+   otherwise each sizes its own columns and the headers wander from group
+   to group. The first column takes whatever is left. */
+.pe-table{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px}
+.pe-table col.pe-c-module{width:14%}
+.pe-table col.pe-c-template{width:24%}
+.pe-table col.pe-c-actions{width:300px}
 .pe-table th{text-align:left;padding:6px 8px;background:#f4f6f8;border-bottom:1px solid #d8dee4;font-weight:bold}
 .pe-table td{padding:6px 8px;border-bottom:1px solid #eceff2;vertical-align:top}
 .pe-table tr.pe-off td{color:#888}
 .pe-table .pe-label{font-weight:bold}
 .pe-table .pe-desc{color:#555;font-weight:normal;display:block;margin-top:2px}
-.pe-table .pe-tpl{white-space:nowrap;font-family:Menlo,Consolas,monospace;font-size:12px}
+.pe-table .pe-tpl{overflow-wrap:anywhere;font-family:Menlo,Consolas,monospace;font-size:12px}
 .pe-table .pe-fallback{color:#8a6d00}
 .pe-table .pe-na{color:#a40000;font-size:12px;display:block}
 .pe-actions{white-space:nowrap}
@@ -234,6 +240,12 @@ $previewEmailFormAction = zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL');
         <div class="pe-group">
             <h2><?= zen_output_string_protected($groupName); ?></h2>
             <table class="pe-table">
+                <colgroup>
+                    <col class="pe-c-email">
+                    <col class="pe-c-module">
+                    <col class="pe-c-template">
+                    <col class="pe-c-actions">
+                </colgroup>
                 <thead>
                     <tr>
                         <th><?= PREVIEW_EMAIL_COL_EMAIL; ?></th>
