@@ -26,7 +26,7 @@ $define = [
 
     /* send box */
     'PREVIEW_EMAIL_SEND_HEADING' => 'Send a Test',
-    'PREVIEW_EMAIL_SEND_TO' => 'to',
+    'PREVIEW_EMAIL_SEND_TO' => 'To:',
     'PREVIEW_EMAIL_SEND_HELP' => 'Press Send Test on any row below. The format chosen here is used for that one send, whatever this address\'s stored preference is. Tests go through the store\'s own email settings, so what arrives is what a customer would get.',
     'PREVIEW_EMAIL_FORMAT_HTML' => 'HTML',
     'PREVIEW_EMAIL_FORMAT_TEXT' => 'Plain Text',
