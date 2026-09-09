@@ -3,7 +3,11 @@
 Not packaged; the text to paste into the Zen Cart Plugins Library submission
 form. Committed so the wording is versioned with the code.
 
-**Name:** Preview Email
+**Name:** Preview Email v3.0.0 (an update to the existing listing, vb2220)
+
+**Plugin ID:** 2220
+
+**Forum thread:** https://www.zen-cart.com/threads/201011 (existing Preview Email thread; the 3.0.0 announcement is a reply in it, see SUPPORT_THREAD.md)
 
 **Category:** Admin Tools
 
@@ -41,4 +45,4 @@ Preview Email 1.x and 2.x were written by Scott C. Wilson (That Software Guy). V
 
 Upload zc_plugins/PreviewEmail/ into your store's zc_plugins/ directory, then Modules > Plugin Manager > Preview Email > Install. The page is at Tools > Preview Email. Upgrading from 1.x/2.x: install 3.0.0 (it removes the old menu row), then delete the old files from your admin directory; the readme lists them.
 
-**Note on the Name:** the Library already lists "Preview Email" (vb2220, swguy, v2.1, 1.5.8-2.0.0), the version this continues. If the moderators prefer a distinct listing name, "Preview Email 3" or "Preview and Test Email" are both one-line changes to `pluginName` in the manifest and the readme heading; the plugin key and directory (`PreviewEmail`) need not change.
+**Note on the Name:** 3.0.0 is submitted as an update to the existing "Preview Email" listing (vb2220, swguy, v2.1) rather than as a new plugin, per John, 2026-09-09. The manifest carries pluginId 2220 and the thread permalink already.

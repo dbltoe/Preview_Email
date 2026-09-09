@@ -36,11 +36,10 @@ $previewEmailReadmeUrl = (defined('DIR_WS_CATALOG') ? DIR_WS_CATALOG : '/') . $p
 $previewEmailGithubUrl = 'https://github.com/dbltoe/Preview_Email';
 
 /**
- * The Zen Cart forum's support thread for this plugin, as the permalink to
- * the opening post. Empty renders nothing, which is right until the thread
- * exists: a link that 404s is worse than no link.
+ * The Zen Cart forum's support thread for this plugin: the existing Preview
+ * Email thread, as the permalink to its opening post.
  */
-$previewEmailForumUrl = '';
+$previewEmailForumUrl = 'https://www.zen-cart.com/threads/201011?page=1#post-1286460';
 
 $previewEmailButtonGap = '6px';
 
@@ -76,10 +75,11 @@ return [
     // Shown as the Author in Plugin Manager, and stored in
     // plugin_control.author / plugin_control_versions.author (varchar(64)).
     'pluginAuthor' => 'My Zen Cart Host (dbltoe)',
-    // ID from the Zen Cart Plugins Library, assigned on acceptance. It has
+    // ID of the Plugins Library listing this continues, Preview Email by
+    // swguy: https://www.zen-cart.com/plugins/preview-email-vb2220. It has
     // to be right the FIRST time a store installs the plugin: on v1.5.8/
     // v2.0/v2.1 the row keeps whatever the original INSERT put there.
-    'pluginId' => 0,
+    'pluginId' => 2220,
     'zcVersions' => ['v158', 'v200', 'v210', 'v220', 'v230', 'v300'],
     'changelog' => 'changelog.txt',
     'github_repo' => $previewEmailGithubUrl,

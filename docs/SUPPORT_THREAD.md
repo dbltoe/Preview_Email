@@ -1,11 +1,9 @@
-# Forum Support Thread, Opening Post
+# Forum Support Thread, 3.0.0 Announcement
 
-Not packaged. The opening post for the Zen Cart forum support thread. Once
-the thread exists, put the permalink to THIS post (the `/threads/N?page=1#post-M`
-form) into `$previewEmailForumUrl` in manifest.php, the readme and the Library
-listing, rebuild, and re-upload, before anyone installs from the Library: on
-1.5.8, 2.0 and 2.1 the Plugin Manager panel is written once and never
-refreshed.
+Not packaged. The post announcing 3.0.0, as a reply in the existing Preview
+Email thread, https://www.zen-cart.com/threads/201011 (John, 2026-09-09).
+The manifest, readme and Library listing already carry the permalink to that
+thread's opening post, so nothing needs changing after the reply is made.
 
 ---
 
