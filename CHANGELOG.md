@@ -35,6 +35,10 @@ the ones with templates.
   `NOTIFY_EMAIL_DETERMINING_EMAIL_FORMAT` notifier, so an address the store
   does not know (which core would send plain text) can still get the HTML.
   Tests go through the store's real transport and settings.
+- **Hooks for other plugins.** Six notifiers fired through the admin
+  notifier: definitions loaded, message built, an unknown page action, extra
+  row buttons, a page-top box, and extra preview-strip lines. Documented in
+  docs/CUSTOMIZING.md; Preview Email Pro builds on them.
 - **The stylesheet named.** The preview strip names the `email_common.css`
   core pours into the template, and says when the template carries rules of
   its own or the template or message content uses inline styles, since those

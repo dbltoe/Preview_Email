@@ -24,6 +24,56 @@ if (!defined('PREVIEW_EMAIL_LOOKBACK')) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Hooks
+ *
+ * Every point another plugin can extend, fired through the admin's own
+ * $zco_notifier so an ordinary admin observer picks them up. Silent when
+ * nothing listens. The names and their parameters are the contract that
+ * Preview Email Pro (and anyone else) builds on, so they do not change
+ * within 3.x.
+ *
+ *   NOTIFY_PREVIEW_EMAIL_DEFINITIONS_LOADED
+ *       p1 = []                 p2 = &$definitions (key => definition)
+ *       After every definition file has been read and the unclaimed
+ *       templates added; add, alter or remove entries here.
+ *   NOTIFY_PREVIEW_EMAIL_MESSAGE_BUILT
+ *       p1 = ['definition' => $def]   p2 = &$message
+ *       After a builder has run and the message is normalized, before it is
+ *       rendered or sent. Change the block, the subject, the text, or point
+ *       EMAIL_TEMPLATE_FILENAME at another file.
+ *   NOTIFY_PREVIEW_EMAIL_ACTION
+ *       p1 = ['action' => string, 'definitions' => array]   p2 = &$handled
+ *       A POSTed action the page does not know. Set $handled = true after
+ *       producing a response (and exit or redirect), or leave it and the page
+ *       redirects to itself.
+ *   NOTIFY_PREVIEW_EMAIL_ROW_ACTIONS
+ *       p1 = ['key' => string, 'definition' => $def, 'available' => bool]
+ *       p2 = &$html   Extra markup appended to the row's action cell, after
+ *       the built-in buttons. Buttons in the page's form post with the
+ *       securityToken already in it.
+ *   NOTIFY_PREVIEW_EMAIL_PAGE_TOP
+ *       p1 = []   p2 = &$html   Markup inserted after the status strip,
+ *       before the send box.
+ *   NOTIFY_PREVIEW_EMAIL_PREVIEW_STRIP
+ *       p1 = ['definition' => $def, 'message' => $message, 'part' => 'html'|'text']
+ *       p2 = &$html   Extra lines appended to the strip above a preview.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Fire a hook through the admin notifier when there is one. $p2 is passed
+ * by reference so an observer can hand something back.
+ *
+ * @param mixed $p1
+ * @param mixed $p2
+ */
+function preview_email_notify(string $event, $p1 = [], &$p2 = null): void
+{
+    if (isset($GLOBALS['zco_notifier']) && is_object($GLOBALS['zco_notifier']) && method_exists($GLOBALS['zco_notifier'], 'notify')) {
+        $GLOBALS['zco_notifier']->notify($event, $p1, $p2);
+    }
+}
+
+/* ------------------------------------------------------------------ *
  * Locating things
  * ------------------------------------------------------------------ */
 
@@ -812,6 +862,8 @@ function preview_email_definitions(array &$problems = []): array
         return strcmp($a['label'], $b['label']);
     });
 
+    preview_email_notify('NOTIFY_PREVIEW_EMAIL_DEFINITIONS_LOADED', [], $defs);
+
     $cacheProblems = $problems;
     return $cache = $defs;
 }
@@ -920,6 +972,7 @@ function preview_email_build(array $def): array
             $message['block'] = $content;
         }
     }
+    preview_email_notify('NOTIFY_PREVIEW_EMAIL_MESSAGE_BUILT', ['definition' => $def], $message);
     return $message;
 }
 

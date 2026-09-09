@@ -72,6 +72,10 @@ function preview_email_banner(array $def, array $message, string $html, string $
     foreach ((array)($GLOBALS['preview_email_skipped_language_files'] ?? []) as $skipped) {
         $lines .= '<div class="pe-note">' . zen_output_string_protected(sprintf(PREVIEW_EMAIL_BANNER_SKIPPED_LANG, $skipped)) . '</div>';
     }
+    // Another plugin's lines for this strip, if any.
+    $extra = '';
+    preview_email_notify('NOTIFY_PREVIEW_EMAIL_PREVIEW_STRIP', ['definition' => $def, 'message' => $message, 'part' => $part], $extra);
+    $lines .= (string)$extra;
     return '<div class="pe-banner" style="font:13px/1.5 Arial,Helvetica,sans-serif;background:#fffbe6;border-bottom:2px solid #e0c060;padding:8px 14px;color:#333">'
         . '<style>.pe-banner .pe-warn{color:#a40000;margin-top:4px}.pe-banner .pe-note{color:#555;margin-top:2px}</style>'
         . $lines . '</div>';
@@ -142,6 +146,19 @@ if ($previewEmailAction === 'preview' || $previewEmailAction === 'send') {
         }
     } else {
         $messageStack->add_session(sprintf(PREVIEW_EMAIL_NOT_SENT, zen_output_string_protected($def['label'])) . ' ' . zen_output_string_protected($result['reason']), 'error');
+    }
+    zen_redirect(zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL'));
+}
+
+if ($previewEmailAction !== '') {
+    // An action this page does not know: another plugin's, or nobody's.
+    // The token was checked by init_sessions.php because the request had an
+    // action; a listener that produces its own response sets $handled.
+    $previewEmailHandled = false;
+    preview_email_notify('NOTIFY_PREVIEW_EMAIL_ACTION', ['action' => $previewEmailAction, 'definitions' => $previewEmailDefs], $previewEmailHandled);
+    if ($previewEmailHandled === true) {
+        require DIR_WS_INCLUDES . 'application_bottom.php';
+        exit;
     }
     zen_redirect(zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL'));
 }
@@ -226,6 +243,13 @@ $previewEmailFormAction = zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL');
         <?= PREVIEW_EMAIL_STATUS_STYLESHEET; ?> <?= $previewEmailStylesheet['path'] !== '' ? zen_output_string_protected($previewEmailStylesheet['relative']) : '<span class="pe-bad">' . PREVIEW_EMAIL_BANNER_NO_STYLESHEET . '</span>'; ?>
     </div>
 
+    <?php
+    // Another plugin's own box, if any, between the status strip and the send box.
+    $previewEmailPageTop = '';
+preview_email_notify('NOTIFY_PREVIEW_EMAIL_PAGE_TOP', [], $previewEmailPageTop);
+echo (string)$previewEmailPageTop;
+?>
+
     <?php if ($previewEmailProblems !== []) { ?>
     <div class="pe-problems">
         <strong><?= PREVIEW_EMAIL_PROBLEMS; ?></strong>
@@ -301,6 +325,12 @@ $previewEmailFormAction = zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL');
                             <?php } else { ?>
                             &mdash;
                             <?php } ?>
+                            <?php
+                            // Another plugin's buttons for this row, if any.
+                            $previewEmailRowExtra = '';
+                    preview_email_notify('NOTIFY_PREVIEW_EMAIL_ROW_ACTIONS', ['key' => $key, 'definition' => $def, 'available' => $on], $previewEmailRowExtra);
+                    echo (string)$previewEmailRowExtra;
+                    ?>
                         </td>
                     </tr>
                 <?php } ?>

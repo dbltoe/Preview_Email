@@ -116,6 +116,29 @@ anyone else's.
 Copy the definition to `<admin>/includes/email_preview/` and keep its `key`.
 The store's copy is read last and wins.
 
+## Hooks for Other Plugins
+
+Beyond definitions, the page and the library fire six notifiers through the
+admin's `$zco_notifier`, so an ordinary admin observer
+(`admin/includes/classes/observers/auto.*.php` in your plugin) can extend
+Preview Email without touching it. Each is fired with `$p1` by value and
+`$p2` by reference; what you put in `$p2` is what Preview Email uses. The
+names and parameters are a contract and do not change within 3.x.
+
+| Notifier | `$p1` | `$p2` (by reference) | When |
+|---|---|---|---|
+| `NOTIFY_PREVIEW_EMAIL_DEFINITIONS_LOADED` | `[]` | the definitions array, `key => definition` | after every definition file is read and unclaimed templates added; add, alter or remove entries |
+| `NOTIFY_PREVIEW_EMAIL_MESSAGE_BUILT` | `['definition' => $def]` | the built message | after a builder runs, before rendering or sending; change the block, subject or text, or set `EMAIL_TEMPLATE_FILENAME` in the block to render another file |
+| `NOTIFY_PREVIEW_EMAIL_ACTION` | `['action' => string, 'definitions' => array]` | `$handled` (bool) | a POSTed `action` the page does not know; produce your own response and set `$handled = true`, or leave it and the page redirects to itself |
+| `NOTIFY_PREVIEW_EMAIL_ROW_ACTIONS` | `['key', 'definition', 'available']` | HTML | appended to the row's action cell after the built-in buttons; the page's form already carries the `securityToken` |
+| `NOTIFY_PREVIEW_EMAIL_PAGE_TOP` | `[]` | HTML | inserted after the status strip, before the send box |
+| `NOTIFY_PREVIEW_EMAIL_PREVIEW_STRIP` | `['definition', 'message', 'part']` | HTML | appended to the strip above an HTML or text preview |
+
+A button returned from `NOTIFY_PREVIEW_EMAIL_ROW_ACTIONS` that submits the
+page's form with its own `action` value reaches `NOTIFY_PREVIEW_EMAIL_ACTION`
+with the token already checked by Zen Cart. Escape everything you return;
+it is echoed as is.
+
 ## The Legacy Hook
 
 Preview Email 1.x and 2.x called `preview_email_custom($action, &$content)`
