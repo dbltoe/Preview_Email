@@ -33,9 +33,33 @@ $previewEmailScfPrepare = static function () use ($previewEmailScfDir): void {
     }
 };
 
-/** The header-image block the plugin adds to its HTML messages, if any. */
-$previewEmailScfHeader = static function (): array {
-    return function_exists('scf_header_image_block') ? (array)scf_header_image_block() : [];
+/**
+ * The header-image block the plugin adds to its HTML messages, if any.
+ *
+ * SCF uses only a header image the store owner has uploaded on its
+ * Subscribers page. Until then it points the template's image tag at a
+ * transparent 1x1 spacer, so its emails go out with a blank header rather
+ * than the store logo. A blank in a preview is easy to mistake for the
+ * finished email, so the preview (and a test send) shows a placeholder banner
+ * that says what is going on and where to fix it. The real email still
+ * carries the spacer, and the strip says so.
+ *
+ * @param string[] $notes  a note is appended when the placeholder is used
+ */
+$previewEmailScfHeader = static function (array &$notes): array {
+    $block = function_exists('scf_header_image_block') ? (array)scf_header_image_block() : [];
+    $logo = (string)($block['EMAIL_LOGO_FILE'] ?? '');
+    if ($logo === '' || substr($logo, -10) !== 'spacer.png') {
+        return $block; // an uploaded image, or nothing (core then uses the store logo)
+    }
+    $notes[] = 'Social Contact Footer sends this email with a blank header: it uses only a header image uploaded on Tools > Footer Newsletter Subscribers (its own page, not its Configuration settings), and none is. The banner shown here is a placeholder from Preview Email, not part of the real email.';
+    return [
+        'EMAIL_LOGO_FILE' => HTTP_CATALOG_SERVER . DIR_WS_CATALOG . 'zc_plugins/PreviewEmail/v3.0.0/images/scf_header_placeholder.png',
+        'EMAIL_LOGO_ALT_TEXT' => 'Placeholder header: no image is set for Social Contact Footer emails',
+        'EMAIL_LOGO_ALT_TITLE_TEXT' => 'Placeholder header: no image is set for Social Contact Footer emails',
+        'EMAIL_LOGO_WIDTH' => '550',
+        'EMAIL_LOGO_HEIGHT' => '110',
+    ];
 };
 
 $previewEmailScfSubscriber = static function (string $subjectKey, string $textKey, string $htmlKey, string $module, string $primaryPage, string $primaryParams) use ($previewEmailScfPrepare, $previewEmailScfHeader): callable {
@@ -48,7 +72,8 @@ $previewEmailScfSubscriber = static function (string $subjectKey, string $textKe
         $primary = str_replace('&amp;', '&', zen_catalog_href_link($primaryPage, $primaryParams . $token, 'SSL', false));
         $unsubscribe = str_replace('&amp;', '&', zen_catalog_href_link('index', 'scf_unsubscribe=' . $token, 'SSL', false));
         $block = ['EMAIL_MESSAGE_HTML' => sprintf(preview_email_const($htmlKey, '<p>%1$s %2$s %3$s %4$s</p>'), zen_output_string_protected($store), zen_output_string_protected($primary), zen_output_string_protected($unsubscribe), zen_output_string_protected($from))];
-        $block = array_merge($block, $previewEmailScfHeader());
+        $notes = [];
+        $block = array_merge($block, $previewEmailScfHeader($notes));
         return [
             'subject' => sprintf(preview_email_const($subjectKey, '%s'), $store),
             'text' => sprintf(preview_email_const($textKey, "%1\$s %2\$s %3\$s %4\$s"), $store, $primary, $unsubscribe, $from),
@@ -56,6 +81,7 @@ $previewEmailScfSubscriber = static function (string $subjectKey, string $textKe
             'module' => $module,
             'to_name' => $customer['email'],
             'to_email' => $customer['email'],
+            'notes' => $notes,
         ];
     };
 };
@@ -73,7 +99,8 @@ $previewEmailScfInvite = static function (bool $resend) use ($previewEmailScfPre
         $subject = $resend ? 'SCF_EMAIL_REINVITE_SUBJECT' : 'SCF_EMAIL_INVITE_SUBJECT';
         $textKey = $resend ? 'SCF_EMAIL_REINVITE_TEXT' : 'SCF_EMAIL_INVITE_TEXT';
         $htmlKey = $resend ? 'SCF_EMAIL_REINVITE_HTML' : 'SCF_EMAIL_INVITE_HTML';
-        $block = $previewEmailScfHeader();
+        $notes = [];
+        $block = $previewEmailScfHeader($notes);
         $block['EMAIL_MESSAGE_HTML'] = sprintf(
             preview_email_const($htmlKey, '<p>%1$s %2$s %3$s %4$s %5$s %6$s</p>'),
             zen_output_string_protected($store),
@@ -89,6 +116,7 @@ $previewEmailScfInvite = static function (bool $resend) use ($previewEmailScfPre
             'block' => $block,
             'to_name' => $customer['name'],
             'to_email' => $customer['email'],
+            'notes' => $notes,
         ];
     };
 };

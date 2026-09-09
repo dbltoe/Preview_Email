@@ -35,6 +35,10 @@ the ones with templates.
   `NOTIFY_EMAIL_DETERMINING_EMAIL_FORMAT` notifier, so an address the store
   does not know (which core would send plain text) can still get the HTML.
   Tests go through the store's real transport and settings.
+- **Social Contact Footer placeholder header.** SCF sends its emails with a
+  blank spacer where the header image goes until one is uploaded on its
+  Subscribers page. The preview and test send show a placeholder banner that
+  says so instead, so nobody mistakes the blank for the finished email.
 - **Hooks for other plugins.** Six notifiers fired through the admin
   notifier: definitions loaded, message built, an unknown page action, extra
   row buttons, a page-top box, and extra preview-strip lines. Documented in
