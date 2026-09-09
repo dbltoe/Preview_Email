@@ -1,0 +1,6 @@
+dist/
+tests/
+tools/
+*.zip
+.DS_Store
+Thumbs.db

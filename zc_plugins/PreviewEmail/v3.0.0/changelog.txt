@@ -1,0 +1,33 @@
+Preview Email - changelog
+
+v3.0.0 (2026-09-09)
+- Rewritten as an encapsulated zc_plugin. Install and uninstall through
+  Modules > Plugin Manager; no files to copy, no SQL patch to run.
+- Runs on Zen Cart v1.5.8 through v3.0.0 from one codebase.
+- Every email Zen Cart itself sends is listed, not just the twelve that
+  had templates: the store copies of the order, welcome, coupon, gift
+  certificate and status emails, the low stock notice, Ask a Question,
+  the pending-review notice, the newsletter, the admin password reset,
+  the admin sign-in code, the admin-account-changed notice and payment
+  module alerts.
+- Emails sent by add-ons are found automatically: any installed plugin
+  can ship an email_preview/ directory describing its emails, and a
+  store can describe its own custom emails in an email_preview/
+  directory under the admin folder. Definitions ship for Social
+  Contact Footer, Admin Add Customer, Fraud Screen, Back in Stock and
+  Recover Cart Sales.
+- Any email_template_*.html file nothing claims is still listed and
+  can be previewed with sample content.
+- Preview the plain-text part as well as the HTML, since that is what
+  a TEXT-Only customer receives.
+- Send a test of any email to any address, forced to HTML or plain
+  text for that one send regardless of the address's stored preference.
+- The preview flags every placeholder in the template that nothing
+  fills, which is how they would appear in the sent email.
+- A store with no orders, customers, products or coupons gets invented
+  sample data instead of an error.
+- The direct_test.html and custom_preview_email.php conventions from
+  1.x/2.x still work.
+
+Versions 1.x and 2.x were written by Scott C. Wilson (That Software Guy)
+and are at https://github.com/scottcwilson/zencart_preview_email.

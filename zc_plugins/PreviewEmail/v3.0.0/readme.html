@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview Email &mdash; Read Me</title>
+<style>
+:root{
+  --bg:#ffffff; --fg:#1f2328; --muted:#57606a; --rule:#d8dee4;
+  --panel:#f6f8fa; --accent:#0969da; --warn-bg:#fff8c5; --warn-br:#d4a72c;
+  --code-bg:#f0f2f4;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0d1117; --fg:#e6edf3; --muted:#9198a1; --rule:#30363d;
+    --panel:#161b22; --accent:#4493f8; --warn-bg:#2d2200; --warn-br:#9e6a03;
+    --code-bg:#161b22;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+     font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+.wrap{max-width:52rem;margin:0 auto;padding:2rem 1.25rem 5rem}
+header{border-bottom:1px solid var(--rule);padding-bottom:1.25rem;margin-bottom:1.5rem}
+h1{font-size:1.75rem;margin:0 0 .3rem}
+.tagline{color:var(--muted);margin:0}
+.meta{color:var(--muted);font-size:.875rem;margin:.75rem 0 0}
+.meta a{color:var(--accent)}
+h2{font-size:1.25rem;margin:2.5rem 0 .75rem;padding-top:1.25rem;border-top:1px solid var(--rule)}
+h3{font-size:1.02rem;margin:1.75rem 0 .5rem}
+p,ul,ol{margin:0 0 1rem}
+ul,ol{padding-left:1.4rem}
+li{margin:.3rem 0}
+a{color:var(--accent)}
+code{background:var(--code-bg);padding:.12em .38em;border-radius:4px;
+     font:.87em/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:var(--panel);border:1px solid var(--rule);border-radius:6px;
+    padding:.85rem 1rem;overflow-x:auto;margin:0 0 1rem}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%;margin:0 0 1.25rem;font-size:.94rem;display:block;overflow-x:auto}
+th,td{border:1px solid var(--rule);padding:.45rem .65rem;text-align:left;vertical-align:top}
+th{background:var(--panel);white-space:nowrap}
+td:first-child{white-space:nowrap}
+.note{background:var(--panel);border-left:4px solid var(--accent);
+      border-radius:0 6px 6px 0;padding:.8rem 1rem;margin:0 0 1.25rem}
+.warn{background:var(--warn-bg);border-left:4px solid var(--warn-br);
+      border-radius:0 6px 6px 0;padding:.8rem 1rem;margin:0 0 1.25rem}
+.note p:last-child,.warn p:last-child{margin-bottom:0}
+nav{background:var(--panel);border:1px solid var(--rule);border-radius:6px;
+    padding:.9rem 1rem;margin:0 0 1.5rem}
+nav p{margin:0 0 .4rem;font-weight:600;font-size:.9rem}
+nav ul{margin:0;padding-left:1.2rem;columns:2;column-gap:2rem}
+nav li{margin:.15rem 0;font-size:.92rem;break-inside:avoid;page-break-inside:avoid}
+footer{margin-top:3rem;padding-top:1.25rem;border-top:1px solid var(--rule);
+       color:var(--muted);font-size:.875rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Preview Email</h1>
+  <p class="tagline">See every email your store can send, as HTML or as plain text, and send yourself a test of any of them.</p>
+  <p class="meta">
+    By My Zen Cart Host (dbltoe) &nbsp;&middot;&nbsp;
+    Version 3.0.0 &nbsp;&middot;&nbsp; Zen Cart v1.5.8 &ndash; v3.0.0 &nbsp;&middot;&nbsp;
+    GPL-2.0 &nbsp;&middot;&nbsp;
+    <a href="https://github.com/dbltoe/Preview_Email" target="_blank" rel="noopener noreferrer">github.com/dbltoe/Preview_Email</a>
+  </p>
+</header>
+
+<nav>
+  <p>On this page</p>
+  <ul>
+    <li><a href="#what">What it does</a></li>
+    <li><a href="#install">Installing</a></li>
+    <li><a href="#upgrade">Upgrading from 1.x / 2.x</a></li>
+    <li><a href="#page">The page</a></li>
+    <li><a href="#preview">Previewing</a></li>
+    <li><a href="#send">Sending a test</a></li>
+    <li><a href="#own">Your own emails</a></li>
+    <li><a href="#plugins">For plugin authors</a></li>
+    <li><a href="#compat">Compatibility</a></li>
+    <li><a href="#history">History and license</a></li>
+  </ul>
+</nav>
+
+<h2 id="what">What it does</h2>
+<p>Zen Cart sends a lot of email, and most of it you never see: the order confirmation goes to the customer, the status update goes to the customer, the low stock notice goes to a copy address. Preview Email puts all of it on one admin page, built from your own recent customers, orders and products, so you can look at each one as the customer will see it, in HTML and in plain text, and send yourself a test of any of them.</p>
+<p>It lists:</p>
+<ul>
+  <li><strong>Every email Zen Cart itself sends</strong> &mdash; not just the twelve that have template files. The store copies of the order, welcome, coupon, gift certificate and status emails; the low stock notice; Ask a Question; the pending-review notice; the newsletter; the admin password reset, the admin sign-in code, the admin-account-changed notice and payment module alerts.</li>
+  <li><strong>The emails your add-ons send</strong>, found automatically when the add-on describes them (see <a href="#plugins">For plugin authors</a>). Descriptions ship here for Social Contact Footer, Admin Add Customer, Fraud Screen, Back in Stock and Recover Cart Sales, and appear only when that add-on is installed.</li>
+  <li><strong>Your own custom emails</strong>, described in a small file under your admin directory.</li>
+  <li><strong>Any template file nothing claims</strong>, so a stray <code>email_template_something.html</code> can still be looked at.</li>
+</ul>
+
+<h2 id="install">Installing</h2>
+<ol>
+  <li>Upload the <code>zc_plugins/PreviewEmail/</code> directory into your store's <code>zc_plugins/</code> directory, so that <code>zc_plugins/PreviewEmail/v3.0.0/manifest.php</code> exists on the server.</li>
+  <li>Open <strong>Modules &rarr; Plugin Manager</strong>, select Preview Email and press <strong>Install</strong>.</li>
+  <li>The page is at <strong>Tools &rarr; Preview Email</strong>.</li>
+</ol>
+<p>Nothing else is created: no configuration group, no database table, one menu entry. Uninstalling from Plugin Manager removes it.</p>
+
+<h2 id="upgrade">Upgrading from Preview Email 1.x or 2.x</h2>
+<p>Those versions were files copied into the admin directory plus an SQL patch. Install 3.0.0 as above; its installer removes the old <code>previewEmail</code> menu row so you do not get two entries. Then delete the old files from your admin directory:</p>
+<pre><code>&lt;admin&gt;/preview_email.php
+&lt;admin&gt;/includes/functions/extra_functions/preview_email.php
+&lt;admin&gt;/includes/languages/english/preview_email.php
+&lt;admin&gt;/includes/languages/english/extra_definitions/preview_email.php</code></pre>
+<p>Keep <code>custom_preview_email.php</code> if you customized it; 3.0.0 still calls <code>preview_email_custom()</code>. A <code>direct_test.html</code> in the catalog root still supplies the direct-email body.</p>
+
+<h2 id="page">The page</h2>
+<p>Across the top, four facts that decide whether a test can arrive, read from Configuration &rarr; E-Mail Options: whether sending is on, whether HTML email is on, the transport, and the template directory. Then the emails, in groups, each row showing the email, the <code>zen_mail()</code> module name, and the template file core will use for it. When an email has no template of its own and the default is what will be used, the row says so. A greyed row is an email this store cannot send right now, with the reason under it.</p>
+
+<h2 id="preview">Previewing</h2>
+<p><strong>Preview HTML</strong> opens a new tab with the message exactly as core would build it: the same template resolution, the same logo, footer and disclaimers. A strip at the top names the template file used and, most usefully, <strong>every placeholder in the template that nothing fills</strong>. Core does not remove those; they go out in the email as literal <code>$NAME</code> text. If you see one here, the template names something the sending code does not provide.</p>
+<p><strong>Preview text</strong> opens the plain-text part, derived the way <code>zen_mail()</code> derives it, disclaimers included. This is what a customer who chose TEXT-Only receives, and what every address the store does not know receives. A message that reads well as HTML can be a wall of link text in this form; it is worth a look.</p>
+
+<h2 id="send">Sending a test</h2>
+<p>Type an address (your own admin address is filled in), choose HTML or plain text, and press <strong>Send test</strong> on any row. The message goes through <code>zen_mail()</code> with the store's real transport and settings, so what arrives is what a customer would get. One thing is different: the format you chose is applied to that one send, through core's own <code>NOTIFY_EMAIL_DETERMINING_EMAIL_FORMAT</code> notifier. Core normally sends plain text to any address it does not find in the customers table, which would make "send me the HTML" impossible for most admin addresses. Nothing about the recipient's stored preference is changed.</p>
+<div class="note"><p>Tests are real sends, to the address you typed and nowhere else. A test of the store copy of an order goes to you, not to the copy address; nothing here ever sends to a customer. Each test is written to the admin activity log.</p></div>
+<p>A refusal names the reason: sending off, HTML off, the module listed in <code>EMAIL_MODULES_TO_SKIP</code>, an invalid address, or the recipient having opted out.</p>
+
+<h2 id="own">Your own emails</h2>
+<p>Preview Email knows about an email because a <strong>definition</strong> describes it: a small PHP file that gives it a name, says which <code>zen_mail()</code> module it uses, and builds a sample. Put yours in <code>&lt;admin&gt;/includes/email_preview/</code>; every <code>.php</code> file there is read and must <code>return</code> a definition or a list of them.</p>
+<pre><code>&lt;?php
+if (!defined('IS_ADMIN_FLAG')) { die('Illegal Access'); }
+
+return [
+    'key'      =&gt; 'renewal_reminder',
+    'label'    =&gt; 'Support renewal reminder',
+    'describe' =&gt; 'Sent eleven months after a purchase.',
+    'module'   =&gt; 'renewal_reminder',
+    'build'    =&gt; static function (array $def): array {
+        $customer = preview_email_sample_customer();
+        [$subject, $text, $html] = my_store_build_renewal_email($customer['name']);
+        return [
+            'subject'  =&gt; $subject,
+            'text'     =&gt; $text,
+            'block'    =&gt; ['EMAIL_MESSAGE_HTML' =&gt; $html],
+            'to_name'  =&gt; $customer['name'],
+            'to_email' =&gt; $customer['email'],
+        ];
+    },
+];</code></pre>
+<p><code>build</code> returns what your real sender passes to <code>zen_mail()</code>: the subject, the text body and the block of template placeholders. Call the same function your sender calls and the preview is exactly your email. Helpers for sample data and language files are listed in <code>docs/CUSTOMIZING.md</code>. A store definition with the same <code>key</code> as a bundled one replaces it.</p>
+
+<h2 id="plugins">For plugin authors</h2>
+<p>Put a directory named <code>email_preview/</code> in your plugin's version directory, next to <code>manifest.php</code>, with one or more definition files in it. Preview Email reads it whenever your plugin is installed and enabled, and lists your emails under your plugin's name. Nothing in your plugin needs to reference Preview Email; if it is not installed, the directory is never read. Group the definitions under your plugin's name and prefix the keys with it so they cannot collide with anyone else's.</p>
+
+<h2 id="compat">Compatibility</h2>
+<table>
+  <tr><th>Zen Cart</th><th>PHP</th><th>Notes</th></tr>
+  <tr><td>1.5.8</td><td>7.4 &ndash; 8.0</td><td>Password reset preview shows the new-password form that release sends.</td></tr>
+  <tr><td>2.0.x, 2.1.x</td><td>8.0 &ndash; 8.3</td><td></td></tr>
+  <tr><td>2.2.x, 2.3.x</td><td>8.2 &ndash; 8.5</td><td></td></tr>
+  <tr><td>3.0.0</td><td>8.3 &ndash; 8.5</td><td>Template directories a plugin registers are searched too.</td></tr>
+</table>
+<p>One codebase for all of them. What that took, and what was verified against each release, is in <code>docs/COMPATIBILITY.md</code>.</p>
+
+<h2 id="history">History and license</h2>
+<p>Preview Email 1.x and 2.x were written by Scott C. Wilson (That Software Guy) and are at <a href="https://github.com/scottcwilson/zencart_preview_email" target="_blank" rel="noopener noreferrer">github.com/scottcwilson/zencart_preview_email</a>. Version 3.0.0 is a rewrite as an encapsulated plugin by My Zen Cart Host (dbltoe), keeping the name, the purpose and the sample-data approach. Both are GPL-2.0.</p>
+
+<footer>
+  Preview Email 3.0.0 &nbsp;&middot;&nbsp; My Zen Cart Host (dbltoe) &nbsp;&middot;&nbsp; GPL-2.0
+</footer>
+
+</div>
+</body>
+</html>
