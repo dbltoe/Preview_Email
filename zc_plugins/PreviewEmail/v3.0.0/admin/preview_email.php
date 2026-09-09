@@ -46,7 +46,19 @@ function preview_email_banner(array $def, array $message, string $html, string $
     $lines .= preview_email_banner_line(PREVIEW_EMAIL_BANNER_SUBJECT, $message['subject']);
     $lines .= preview_email_banner_line(PREVIEW_EMAIL_BANNER_TO, trim($message['to_name'] . ' <' . $message['to_email'] . '>'));
     if ($part === 'html') {
-        $lines .= preview_email_banner_line(PREVIEW_EMAIL_BANNER_TEMPLATE, ($template['path'] !== '' ? basename($template['path']) : PREVIEW_EMAIL_BANNER_NO_TEMPLATE) . ($template['fallback'] ? ' ' . PREVIEW_EMAIL_BANNER_FALLBACK : ''));
+        $lines .= preview_email_banner_line(PREVIEW_EMAIL_BANNER_TEMPLATE, ($template['path'] !== '' ? preview_email_relative_path($template['path']) : PREVIEW_EMAIL_BANNER_NO_TEMPLATE) . ($template['fallback'] ? ' ' . PREVIEW_EMAIL_BANNER_FALLBACK : ''));
+        // Where the styling comes from: the stylesheet core pours into
+        // $EMAIL_COMMON_CSS, any rules the template carries itself, and inline
+        // styles in the template or in the message content.
+        $stylesheet = preview_email_resolve_stylesheet($message['module']);
+        $lines .= preview_email_banner_line(PREVIEW_EMAIL_BANNER_STYLESHEET, ($stylesheet['path'] !== '' ? $stylesheet['relative'] . ' ' . PREVIEW_EMAIL_BANNER_STYLESHEET_HOW : PREVIEW_EMAIL_BANNER_NO_STYLESHEET));
+        $css = preview_email_css_facts($template['path'], $message['block']);
+        if ($css['template_rules']) {
+            $lines .= preview_email_banner_line(PREVIEW_EMAIL_BANNER_CSS_ALSO, PREVIEW_EMAIL_BANNER_TEMPLATE_RULES);
+        }
+        if ($css['template_inline'] > 0 || $css['content_inline'] > 0) {
+            $lines .= preview_email_banner_line(PREVIEW_EMAIL_BANNER_CSS_ALSO, sprintf(PREVIEW_EMAIL_BANNER_INLINE_CSS, $css['template_inline'], $css['content_inline']));
+        }
         $unfilled = preview_email_unfilled_placeholders($html);
         if ($unfilled !== []) {
             $lines .= '<div class="pe-warn"><strong>' . PREVIEW_EMAIL_BANNER_UNFILLED . '</strong> $' . implode(', $', array_map('zen_output_string_protected', $unfilled)) . '</div>';
@@ -208,6 +220,9 @@ $previewEmailFormAction = zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL');
         <?= PREVIEW_EMAIL_STATUS_TRANSPORT; ?> <?= zen_output_string_protected(preview_email_const('EMAIL_TRANSPORT', '?')); ?>
         &nbsp;&middot;&nbsp;
         <?= PREVIEW_EMAIL_STATUS_TEMPLATES; ?> <?= zen_output_string_protected(str_replace(DIR_FS_CATALOG, '', DIR_FS_EMAIL_TEMPLATES)); ?>
+        &nbsp;&middot;&nbsp;
+        <?php $previewEmailStylesheet = preview_email_resolve_stylesheet(); ?>
+        <?= PREVIEW_EMAIL_STATUS_STYLESHEET; ?> <?= $previewEmailStylesheet['path'] !== '' ? zen_output_string_protected($previewEmailStylesheet['relative']) : '<span class="pe-bad">' . PREVIEW_EMAIL_BANNER_NO_STYLESHEET . '</span>'; ?>
     </div>
 
     <?php if ($previewEmailProblems !== []) { ?>

@@ -35,6 +35,10 @@ the ones with templates.
   `NOTIFY_EMAIL_DETERMINING_EMAIL_FORMAT` notifier, so an address the store
   does not know (which core would send plain text) can still get the HTML.
   Tests go through the store's real transport and settings.
+- **The stylesheet named.** The preview strip names the `email_common.css`
+  core pours into the template, and says when the template carries rules of
+  its own or the template or message content uses inline styles, since those
+  win over the stylesheet.
 - **Unfilled placeholders flagged.** The preview strip lists every
   `$PLACEHOLDER` the template names that nothing filled. Core leaves them in
   the sent email as literal text.

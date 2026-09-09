@@ -51,6 +51,12 @@ template file, and:
   something the sending code does not provide (a typo, or a placeholder from
   another template pasted in) or a plugin's email is using a template meant
   for a different email.
+- **Where the styling comes from.** The stylesheet core pours into the
+  template's `$EMAIL_COMMON_CSS` placeholder, normally `email/email_common.css`
+  (a language subfolder copy wins for that language). When the template
+  carries rules of its own in a `<style>` block, or the template or the message
+  content uses inline `style` attributes, a second line says so, because those
+  win over the stylesheet and are why an edit to it sometimes changes nothing.
 - Any notes from the builder, such as "this store has no orders yet, so the
   order shown is invented".
 

@@ -144,6 +144,71 @@ function preview_email_resolve_template(string $module, string $pageBase = '', a
 }
 
 /**
+ * Which stylesheet core will pour into $EMAIL_COMMON_CSS for a module: the
+ * first email_common.css found, language subfolder first, in the same
+ * template roots as the template itself.
+ *
+ * @return array{path: string, relative: string}  both '' when none exists
+ */
+function preview_email_resolve_stylesheet(string $module = 'default'): array
+{
+    $lang = preview_email_lang_folder();
+    foreach (preview_email_template_roots($module) as $root) {
+        foreach ([$lang . 'email_common.css', 'email_common.css'] as $pattern) {
+            if ($pattern === '' || !is_file($root . $pattern)) {
+                continue;
+            }
+            $path = $root . $pattern;
+            return ['path' => $path, 'relative' => preview_email_relative_path($path)];
+        }
+    }
+    return ['path' => '', 'relative' => ''];
+}
+
+/**
+ * A path relative to the catalog root, for display.
+ */
+function preview_email_relative_path(string $path): string
+{
+    $path = str_replace('\\', '/', $path);
+    $root = str_replace('\\', '/', DIR_FS_CATALOG);
+    return (strpos($path, $root) === 0) ? substr($path, strlen($root)) : $path;
+}
+
+/**
+ * Where else styling comes from, beyond the stylesheet: rules the template
+ * carries in its own <style> blocks (apart from the $EMAIL_COMMON_CSS
+ * placeholder), and inline style attributes in the template and in the
+ * message content the sending code supplies.
+ *
+ * @return array{template_rules: bool, template_inline: int, content_inline: int}
+ */
+function preview_email_css_facts(string $templatePath, array $block): array
+{
+    $template = ($templatePath !== '' && is_file($templatePath)) ? (string)file_get_contents($templatePath) : '';
+    $rules = false;
+    if (preg_match_all('~<style\b[^>]*>(.*?)</style>~is', $template, $m)) {
+        foreach ($m[1] as $css) {
+            $css = trim(str_replace('$EMAIL_COMMON_CSS', '', $css));
+            if ($css !== '') {
+                $rules = true;
+            }
+        }
+    }
+    $content = '';
+    foreach ($block as $value) {
+        if (is_string($value)) {
+            $content .= $value . "\n";
+        }
+    }
+    return [
+        'template_rules' => $rules,
+        'template_inline' => (int)preg_match_all('~\sstyle\s*=\s*["\']~i', $template),
+        'content_inline' => (int)preg_match_all('~\sstyle\s*=\s*["\']~i', $content),
+    ];
+}
+
+/**
  * Every email_template_*.html in the template directories, by short name.
  *
  * @return array<string, string>  name => path
