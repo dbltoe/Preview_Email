@@ -35,6 +35,7 @@ $define = [
     'PREVIEW_EMAIL_COL_EMAIL' => 'Email',
     'PREVIEW_EMAIL_COL_MODULE' => 'Module',
     'PREVIEW_EMAIL_COL_TEMPLATE' => 'Template File',
+    'PREVIEW_EMAIL_COL_CSS' => 'CSS:',
     'PREVIEW_EMAIL_COL_ACTIONS' => '',
     'PREVIEW_EMAIL_BTN_HTML' => 'Preview HTML',
     'PREVIEW_EMAIL_BTN_TEXT' => 'Preview Text',

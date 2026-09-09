@@ -28,9 +28,7 @@ return [
             $customer = preview_email_sample_customer();
             $message = preview_email_const('PREVIEW_EMAIL_SAMPLE_CONTACT_MESSAGE', 'Hello, I have a question about my recent order. Could you let me know when it will ship? Thank you.');
             $from = preview_email_const('OFFICE_FROM', 'From:') . ' ' . $customer['name'] . '<br>' . preview_email_const('OFFICE_EMAIL', 'E-Mail:') . '(' . $customer['email'] . ')';
-            $extra = function_exists('email_collect_extra_info')
-                ? email_collect_extra_info($customer['name'], $customer['email'], $customer['name'], $customer['email'], $customer['telephone'])
-                : ['HTML' => '', 'TEXT' => ''];
+            $extra = preview_email_extra_info($customer['name'], $customer['email'], $customer['name'], $customer['email'], $customer['telephone']);
             return [
                 'subject' => preview_email_const('EMAIL_SUBJECT', 'Contact Us'),
                 'text' => $message . (string)($extra['TEXT'] ?? ''),
@@ -67,9 +65,7 @@ return [
             $question = preview_email_const('PREVIEW_EMAIL_SAMPLE_QUESTION', 'Does this come in other colors, and is it in stock right now?');
             $message = preview_email_const('TEXT_PRODUCT_NAME', 'Product:') . ' ' . $product['name'] . "\n\n" . $question;
             $from = preview_email_const('OFFICE_FROM', 'From:') . ' ' . $customer['name'] . '<br>' . preview_email_const('OFFICE_EMAIL', 'E-Mail:') . '(' . $customer['email'] . ')';
-            $extra = function_exists('email_collect_extra_info')
-                ? email_collect_extra_info($customer['name'], $customer['email'], $customer['name'], $customer['email'], $customer['telephone'])
-                : ['HTML' => '', 'TEXT' => ''];
+            $extra = preview_email_extra_info($customer['name'], $customer['email'], $customer['name'], $customer['email'], $customer['telephone']);
             return [
                 'subject' => preview_email_const('EMAIL_SUBJECT', 'Question about a product') . ' ' . $product['name'],
                 'text' => $message . (string)($extra['TEXT'] ?? ''),
@@ -102,9 +98,7 @@ return [
             $intro = sprintf(preview_email_const('EMAIL_PRODUCT_REVIEW_CONTENT_INTRO', 'A new review has been submitted for %s.'), $product['name']);
             $details = sprintf(preview_email_const('EMAIL_PRODUCT_REVIEW_CONTENT_DETAILS', 'Review: %s'), $review);
             $subject = sprintf(preview_email_const('EMAIL_REVIEW_PENDING_SUBJECT', 'Review pending approval for %s'), $product['name']);
-            $extra = function_exists('email_collect_extra_info')
-                ? email_collect_extra_info('', '', $customer['name'], $customer['email'])
-                : ['HTML' => '', 'TEXT' => ''];
+            $extra = preview_email_extra_info('', '', $customer['name'], $customer['email']);
             return [
                 'subject' => $subject,
                 'text' => $intro . "\n\n" . $details . "\n\n" . (string)($extra['TEXT'] ?? ''),

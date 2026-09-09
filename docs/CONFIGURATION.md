@@ -32,7 +32,9 @@ For each row:
   rules: the module name, then the module with `_extra`/`_admin` removed,
   then the page it is sent from, then `email_template_default.html`. When
   the default is what will be used because the email has no template of its
-  own, the row says so.
+  own, the row says so. Under it, the stylesheet core will pour into that
+  template (`email/email_common.css`, or a language subfolder copy), so the
+  two files that shape the email are named side by side.
 
 A grayed row is an email this store cannot send right now (for example the
 gift certificate emails when the Gift Certificates order-total module is not

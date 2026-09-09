@@ -185,6 +185,7 @@ $previewEmailFormAction = zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL');
 .pe-table .pe-desc{color:#555;font-weight:normal;display:block;margin-top:2px}
 .pe-table .pe-tpl{overflow-wrap:anywhere;font-family:Menlo,Consolas,monospace;font-size:12px}
 .pe-table .pe-fallback{color:#8a6d00}
+.pe-table .pe-css{display:block;color:#555;margin-top:2px}
 .pe-table .pe-na{color:#a40000;font-size:12px;display:block}
 .pe-actions{white-space:nowrap}
 .pe-actions button{margin:0 4px 4px 0}
@@ -286,9 +287,11 @@ $previewEmailFormAction = zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL');
                             <?php if ($template['path'] === '') { ?>
                                 <span class="pe-fallback"><?= PREVIEW_EMAIL_BANNER_NO_TEMPLATE; ?></span>
                             <?php } else { ?>
-                                <?= zen_output_string_protected(basename($template['path'])); ?>
+                                <?= zen_output_string_protected(preview_email_relative_path($template['path'])); ?>
                                 <?php if ($template['fallback']) { ?><span class="pe-fallback"><?= PREVIEW_EMAIL_TEMPLATE_FALLBACK; ?></span><?php } ?>
                             <?php } ?>
+                            <?php $stylesheet = preview_email_resolve_stylesheet($def['module']); ?>
+                            <span class="pe-css"><?= PREVIEW_EMAIL_COL_CSS; ?> <?= $stylesheet['path'] !== '' ? zen_output_string_protected($stylesheet['relative']) : '<span class="pe-fallback">' . PREVIEW_EMAIL_BANNER_NO_TEMPLATE . '</span>'; ?></span>
                         </td>
                         <td class="pe-actions">
                             <?php if ($on) { ?>

@@ -403,6 +403,37 @@ function preview_email_const(string $name, string $fallback = ''): string
 }
 
 /**
+ * Core's extra-info block for the store copies of an email, built in admin
+ * context.
+ *
+ * email_collect_extra_info() reads two storefront session keys, the
+ * customer's IP and host address, that never exist in an admin session, and
+ * PHP 8 warns on each read. They are supplied for the duration of the call
+ * (the admin's own address stands in for the customer's) and removed again,
+ * so nothing is left in the admin session.
+ *
+ * @return array{HTML: string, TEXT: string}
+ */
+function preview_email_extra_info(string $from, string $emailFrom, string $login, string $loginEmail, string $phone = ''): array
+{
+    if (!function_exists('email_collect_extra_info')) {
+        return ['HTML' => '', 'TEXT' => ''];
+    }
+    $added = [];
+    foreach (['customers_ip_address' => (string)($_SERVER['REMOTE_ADDR'] ?? ''), 'customers_host_address' => ''] as $key => $value) {
+        if (!isset($_SESSION[$key])) {
+            $_SESSION[$key] = $value;
+            $added[] = $key;
+        }
+    }
+    $extra = email_collect_extra_info($from, $emailFrom, $login, $loginEmail, $phone);
+    foreach ($added as $key) {
+        unset($_SESSION[$key]);
+    }
+    return ['HTML' => (string)($extra['HTML'] ?? ''), 'TEXT' => (string)($extra['TEXT'] ?? '')];
+}
+
+/**
  * Is a module one core treats as non-transactional (and so appends the
  * disclaimers to the text part)? The same list on 1.5.8, 2.x and 3.0.0;
  * on 3.0.0 it is a private method of the Email class, so it is mirrored
@@ -1029,9 +1060,7 @@ function preview_email_extra_builder(string $baseKey): callable
         }
         $base = preview_email_build($defs[$baseKey]);
         $customer = preview_email_sample_customer();
-        $extra = function_exists('email_collect_extra_info')
-            ? email_collect_extra_info($customer['name'], $customer['email'], $customer['name'], $customer['email'], $customer['telephone'])
-            : ['HTML' => '', 'TEXT' => ''];
+        $extra = preview_email_extra_info($customer['name'], $customer['email'], $customer['name'], $customer['email'], $customer['telephone']);
         $base['block']['EXTRA_INFO'] = (string)($extra['HTML'] ?? '');
         $base['text'] .= (string)($extra['TEXT'] ?? '');
         $base['module'] = $def['module'];
