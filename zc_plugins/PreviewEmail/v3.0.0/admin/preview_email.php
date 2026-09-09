@@ -185,8 +185,11 @@ $previewEmailFormAction = zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL');
 <!-- body //-->
 <div class="container-fluid pe-wrap">
     <h1><?= HEADING_TITLE; ?></h1>
-    <?php if (isset($messageStack) && $messageStack->size('header') > 0) {
-        echo $messageStack->output('header');
+    <?php
+    // The admin messageStack has a size PROPERTY and a no-argument output();
+    // size() and output('header') are the storefront class's API.
+    if (isset($messageStack) && $messageStack->size > 0) {
+        echo $messageStack->output();
     } ?>
     <p class="pe-intro"><?= PREVIEW_EMAIL_INTRO; ?></p>
 
