@@ -22,7 +22,7 @@ return [
         'key' => 'fraud_screen_hold',
         'group' => 'Fraud Screen',
         'sort' => 10,
-        'label' => 'Order held for review',
+        'label' => 'Order Held for Review',
         'describe' => 'Sent to the Fraud Screen notification address when an order scores above the threshold.',
         'module' => 'default',
         'page_base' => 'checkout_process',

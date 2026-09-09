@@ -762,7 +762,7 @@ function preview_email_grouped(array $defs): array
 
 /**
  * Is a definition usable right now? Returns true, or a string saying why not
- * (shown next to a greyed-out entry). A definition's 'available' entry may be
+ * (shown next to a grayed-out entry). A definition's 'available' entry may be
  * a bool, a string, or a callable returning either.
  *
  * @return bool|string

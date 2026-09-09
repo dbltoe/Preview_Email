@@ -3,7 +3,7 @@
 There is nothing to configure. Everything is on one page, **Tools > Preview
 Email**.
 
-## The status strip
+## The Status Strip
 
 Across the top, four facts about the store that decide whether a test send
 can arrive, read from Configuration > E-Mail Options:
@@ -18,7 +18,7 @@ can arrive, read from Configuration > E-Mail Options:
 - **Templates in** -- the directory core reads templates from, normally
   `email/`.
 
-## The list
+## The List
 
 Emails are grouped: Zen Cart's own, Zen Cart's admin notices, one group per
 add-on, your store's own definitions, and any template file nothing claims.
@@ -34,7 +34,7 @@ For each row:
   the default is what will be used because the email has no template of its
   own, the row says so.
 
-A greyed row is an email this store cannot send right now (for example the
+A grayed row is an email this store cannot send right now (for example the
 gift certificate emails when the Gift Certificates order-total module is not
 installed). The reason is under the label.
 
@@ -54,7 +54,7 @@ template file, and:
 - Any notes from the builder, such as "this store has no orders yet, so the
   order shown is invented".
 
-## Preview text
+## Preview Text
 
 Opens a new tab with the plain-text part, derived the way `zen_mail()`
 derives it: an explicit text body has its tags stripped except for the few
@@ -67,7 +67,7 @@ receives, and what every address the store does not know receives. It is
 worth looking at; a message that reads well as HTML can be a wall of link
 text in this form.
 
-## Send test
+## Send Test
 
 Type an address (your own admin address is filled in), choose HTML or plain
 text, and press **Send test** on any row. The message goes through

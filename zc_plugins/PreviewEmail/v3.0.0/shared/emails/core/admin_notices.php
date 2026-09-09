@@ -13,7 +13,7 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
-$previewEmailGroupAdmin = preview_email_const('PREVIEW_EMAIL_GROUP_ADMIN', 'Zen Cart admin notices');
+$previewEmailGroupAdmin = preview_email_const('PREVIEW_EMAIL_GROUP_ADMIN', 'Zen Cart Admin Notices');
 
 $previewEmailAdminName = static function (): array {
     $name = (string)($_SESSION['admin_name'] ?? '');
@@ -40,7 +40,7 @@ return [
         'key' => 'password_forgotten_admin',
         'group' => $previewEmailGroupAdmin,
         'sort' => 10,
-        'label' => preview_email_const('PREVIEW_EMAIL_LABEL_PASSWORD_FORGOTTEN_ADMIN', 'Admin password reset'),
+        'label' => preview_email_const('PREVIEW_EMAIL_LABEL_PASSWORD_FORGOTTEN_ADMIN', 'Admin Password Reset'),
         'describe' => preview_email_const('PREVIEW_EMAIL_DESC_PASSWORD_FORGOTTEN_ADMIN', 'Sent to an admin user who asks for a new password on the admin login page.'),
         'module' => 'password_forgotten_admin',
         'page_base' => 'password_forgotten',
@@ -61,7 +61,7 @@ return [
         'key' => 'admin_mfa',
         'group' => $previewEmailGroupAdmin,
         'sort' => 11,
-        'label' => preview_email_const('PREVIEW_EMAIL_LABEL_ADMIN_MFA', 'Admin sign-in verification code'),
+        'label' => preview_email_const('PREVIEW_EMAIL_LABEL_ADMIN_MFA', 'Admin Sign-In Verification Code'),
         'describe' => preview_email_const('PREVIEW_EMAIL_DESC_ADMIN_MFA', 'The multi-factor code emailed at admin sign-in (Zen Cart 2.0 and later). Sent with the no_archive module so it is never written to the email archive.'),
         'module' => 'no_archive',
         'page_base' => 'login',
@@ -87,7 +87,7 @@ return [
         'key' => 'admin_settings_changed',
         'group' => $previewEmailGroupAdmin,
         'sort' => 12,
-        'label' => preview_email_const('PREVIEW_EMAIL_LABEL_ADMIN_SETTINGS_CHANGED', 'Admin account added, changed or deleted'),
+        'label' => preview_email_const('PREVIEW_EMAIL_LABEL_ADMIN_SETTINGS_CHANGED', 'Admin Account Added, Changed or Deleted'),
         'describe' => preview_email_const('PREVIEW_EMAIL_DESC_ADMIN_SETTINGS_CHANGED', 'Sent to the store owner whenever an admin user is created, edited or removed.'),
         'module' => 'admin_settings_changed',
         'page_base' => 'admin',
@@ -109,7 +109,7 @@ return [
         'key' => 'paymentalert',
         'group' => $previewEmailGroupAdmin,
         'sort' => 13,
-        'label' => preview_email_const('PREVIEW_EMAIL_LABEL_PAYMENTALERT', 'Payment module alert'),
+        'label' => preview_email_const('PREVIEW_EMAIL_LABEL_PAYMENTALERT', 'Payment Module Alert'),
         'describe' => preview_email_const('PREVIEW_EMAIL_DESC_PAYMENTALERT', 'The alert a payment module sends the store owner when a transaction needs attention. The wording is the module\'s own; this shows the layout.'),
         'module' => 'paymentalert',
         'page_base' => 'checkout_process',

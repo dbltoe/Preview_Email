@@ -6,7 +6,7 @@ it uses, and how to build a sample of it. The plugin ships definitions for
 Zen Cart's own emails and for several add-ons. You can add your own, and a
 plugin can ship its own.
 
-## Where definitions are read from
+## Where Definitions Are Read From
 
 In this order. A later definition with the same `key` replaces an earlier
 one, so a store can override anything a plugin ships.
@@ -26,7 +26,7 @@ Every `.php` file in those directories is included and must **return** either
 one definition or a list of them. A file that returns anything else is
 reported at the top of the page and skipped.
 
-## A definition
+## A Definition
 
 ```php
 <?php
@@ -49,7 +49,7 @@ return [
                                              // template name
     'sort' => 10,                            // optional order within the group
     'available' => static function () {     // optional
-        // true: usable. false or a string: listed greyed, with the reason.
+        // true: usable. false or a string: listed grayed, with the reason.
         return defined('MY_RENEWAL_ENABLED') ? true : 'Renewals are turned off.';
     },
     'build' => static function (array $def): array {
@@ -73,7 +73,7 @@ text body, and the `$block` array of template placeholders. Give it exactly
 what your sending code gives, and the preview is exactly your email. The
 usual way is to call the same function your sender calls.
 
-## Helpers you can use in a builder
+## Helpers You Can Use in a Builder
 
 All in `shared/functions.php`, loaded before any definition runs.
 
@@ -99,7 +99,7 @@ All in `shared/functions.php`, loaded before any definition runs.
   of another definition (same message, `EXTRA_INFO` block added, sent to the
   store).
 
-## Shipping definitions in your own plugin
+## Shipping Definitions in Your Own Plugin
 
 Put a directory named `email_preview/` in your plugin's version directory,
 next to `manifest.php`, with one or more definition files in it. Preview
@@ -111,12 +111,12 @@ Group them under your plugin's name (`'group' => 'My Plugin'`) and prefix
 the keys (`'key' => 'myplugin_welcome'`) so they cannot collide with
 anyone else's.
 
-## Overriding a bundled definition
+## Overriding a Bundled Definition
 
 Copy the definition to `<admin>/includes/email_preview/` and keep its `key`.
 The store's copy is read last and wins.
 
-## The legacy hook
+## The Legacy Hook
 
 Preview Email 1.x and 2.x called `preview_email_custom($action, &$content)`
 from `custom_preview_email.php` in the admin `extra_functions` directory, to

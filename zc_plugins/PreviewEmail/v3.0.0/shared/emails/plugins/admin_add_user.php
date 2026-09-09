@@ -23,7 +23,7 @@ return [
         'key' => 'admin_add_user_welcome',
         'group' => 'Admin Add Customer',
         'sort' => 10,
-        'label' => 'Welcome with activation link',
+        'label' => 'Welcome With Activation Link',
         'describe' => 'Sent when you create a customer from admin. The account stays inactive until the link is used.',
         'module' => 'welcome',
         'page_base' => 'add_customers',

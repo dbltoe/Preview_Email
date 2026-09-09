@@ -18,7 +18,7 @@
 Nothing else is created: no configuration group, no database table. The
 installer adds one row to `admin_pages` for the menu entry.
 
-## Upgrading from Preview Email 1.x or 2.x
+## Upgrading From Preview Email 1.x or 2.x
 
 Those versions were installed by copying files into the admin directory and
 running an SQL patch. To move to 3.0.0:
@@ -40,7 +40,7 @@ builders. It does not: the plugin's functions are all prefixed
 `preview_email_` and the old ones were `build_*`, so both can coexist. Still,
 delete the old files; they are dead weight.
 
-## Upgrading 3.0.0 to a later 3.x
+## Upgrading 3.0.0 to a Later 3.x
 
 Upload the new version directory alongside the old one
 (`zc_plugins/PreviewEmail/v3.0.1/` next to `v3.0.0/`), then in Plugin Manager

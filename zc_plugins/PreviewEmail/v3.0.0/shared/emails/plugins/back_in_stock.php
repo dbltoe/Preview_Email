@@ -26,7 +26,7 @@ return [
         'key' => 'back_in_stock',
         'group' => 'Back in Stock',
         'sort' => 10,
-        'label' => $previewEmailBisIsCeon ? 'Back in stock notification (Ceon)' : 'Back in stock notification',
+        'label' => $previewEmailBisIsCeon ? 'Back in Stock Notification (Ceon)' : 'Back in Stock Notification',
         'describe' => 'Sent to customers who asked to be told when a product is available again.',
         'module' => 'back_in_stock_notification',
         'page_base' => 'back_in_stock_notification',

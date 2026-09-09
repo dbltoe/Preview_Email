@@ -11,7 +11,7 @@ have template files; 3.0.0 is a rewrite as a zc_plugin that covers every email
 Zen Cart sends, finds the emails your add-ons send, previews the plain-text
 part too, and sends tests.
 
-## What you get
+## What You Get
 
 **Tools > Preview Email** lists, in groups:
 

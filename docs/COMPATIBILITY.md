@@ -19,7 +19,7 @@ by this plugin:
 | 2.2.x, 2.3.x | 8.2 - 8.5 |
 | 3.0.0 | 8.3 - 8.5 |
 
-## What the plugin relies on, and where it exists
+## What the Plugin Relies On, and Where It Exists
 
 | Used for | Mechanism | 1.5.8 | 2.0 | 2.1 | 2.2 | 2.3 | 3.0 |
 |---|---|---|---|---|---|---|---|
@@ -39,7 +39,7 @@ The template-directory notifier only exists on 3.0.0. The plugin fires it on
 every release; on the others no observer answers and the list is the one
 core directory, which is also what core uses there.
 
-## Things deliberately avoided
+## Things Deliberately Avoided
 
 - **`zen_config()`** is 3.0.0-only. Constants are read with
   `defined() ? constant() : fallback`.
@@ -62,7 +62,7 @@ core directory, which is also what core uses there.
   declared on 2.2+, and PHP 8.2 deprecates creating it. The checkout builder
   keeps its markup in a local variable.
 
-## The HTML/text decision
+## The HTML/Text Decision
 
 On every release, `zen_mail()` sends the HTML part only when
 `EMAIL_USE_HTML` is true **and** the recipient's `customers_email_format` is
@@ -71,7 +71,7 @@ not TEXT). An address not in the customers table has an empty format and
 gets plain text. That is why the test send forces the format through the
 notifier rather than assuming HTML would arrive.
 
-## Template resolution
+## Template Resolution
 
 The plugin resolves the template file the way core does, in this order, in
 each template root:
@@ -87,14 +87,14 @@ each template root:
 This is identical on 1.5.8, 2.2.2 and 3.0.0 (the latter adds the plugin roots
 before the core one).
 
-## Unfilled placeholders
+## Unfilled Placeholders
 
 On every release core's builder replaces `$KEY` for each key in the block and
 leaves any other `$NAME` in the output untouched. The preview scans the
 rendered body (not the stylesheet) for surviving `$UPPER_CASE` tokens and
 lists them, because that is what would go out.
 
-## Preview Email 1.x/2.x on the same store
+## Preview Email 1.x/2.x on the Same Store
 
 The old functions were named `build_*` and `preview_advance()`; everything
 here is prefixed `preview_email_`. The two can coexist during an upgrade, but

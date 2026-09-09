@@ -154,7 +154,6 @@ $previewEmailFormAction = zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL');
 <head>
 <?php require DIR_WS_INCLUDES . 'admin_html_head.php'; ?>
 <style>
-.pe-wrap{max-width:1100px}
 .pe-intro{margin:0 0 14px;color:#444}
 .pe-status{margin:0 0 16px;padding:8px 12px;border-radius:4px;background:#f4f6f8;border:1px solid #d8dee4;font-size:13px}
 .pe-status .pe-bad{color:#a40000;font-weight:bold}
