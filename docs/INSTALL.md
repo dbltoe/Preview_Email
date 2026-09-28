@@ -8,9 +8,9 @@
 
 ## Install
 
-1. Unzip the package. Inside is a `zc_plugins/PreviewEmail/v3.0.0/` directory.
+1. Unzip the package. Inside is a `zc_plugins/PreviewEmail/v3.0.1/` directory.
 2. Upload `zc_plugins/PreviewEmail/` into your store's `zc_plugins/` directory,
-   so that `zc_plugins/PreviewEmail/v3.0.0/manifest.php` exists on the server.
+   so that `zc_plugins/PreviewEmail/v3.0.1/manifest.php` exists on the server.
 3. In admin, open **Modules > Plugin Manager**. Preview Email appears in the
    list as Not Installed. Select it and press **Install**.
 4. The page is now at **Tools > Preview Email**.

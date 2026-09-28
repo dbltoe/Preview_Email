@@ -11,8 +11,8 @@ plugin can ship its own.
 In this order. A later definition with the same `key` replaces an earlier
 one, so a store can override anything a plugin ships.
 
-1. `zc_plugins/PreviewEmail/v3.0.0/shared/emails/core/` -- Zen Cart's emails
-2. `zc_plugins/PreviewEmail/v3.0.0/shared/emails/plugins/` -- bundled add-on
+1. `zc_plugins/PreviewEmail/v3.0.1/shared/emails/core/` -- Zen Cart's emails
+2. `zc_plugins/PreviewEmail/v3.0.1/shared/emails/plugins/` -- bundled add-on
    definitions, each self-guarding (it returns nothing when its add-on is
    not installed)
 3. `zc_plugins/<AnyPlugin>/<version>/email_preview/` -- for every installed,

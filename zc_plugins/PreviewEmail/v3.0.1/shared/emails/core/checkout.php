@@ -117,7 +117,17 @@ return [
                 $comments = $h->EOF ? '' : (string)$h->fields['comments'];
             }
 
-            $delivery = $fake ? $fake['address'] : zen_address_format($order->delivery['format_id'], $order->delivery, 1, '', '<br>');
+            if ($fake) {
+                $delivery = $fake['address'];
+            } elseif (empty($order->delivery) || !is_array($order->delivery)) {
+                // Pickup, virtual and other no-ship orders: the order class sets
+                // ->delivery to false (order::__construct), and send_order_email()
+                // shows 'n/a' for exactly these. Match that, rather than
+                // dereferencing a missing address and blanking the page.
+                $delivery = 'n/a';
+            } else {
+                $delivery = zen_address_format($order->delivery['format_id'], $order->delivery, 1, '', '<br>');
+            }
             $billing = $fake ? $fake['address'] : zen_address_format($order->billing['format_id'], $order->billing, 1, '', '<br>');
             $shipping = $fake ? $fake['shipping'] : ((string)($order->info['shipping_method'] ?? '') !== '' ? (string)$order->info['shipping_method'] : 'n/a');
             $payment = $fake ? $fake['payment'] : (string)($order->info['payment_method'] ?? '');

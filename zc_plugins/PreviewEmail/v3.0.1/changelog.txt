@@ -1,5 +1,12 @@
 Preview Email - changelog
 
+v3.0.1 (2026-09-28)
+- Order Confirmation preview no longer blanks on pickup, virtual and other
+  no-ship orders. Those orders have no delivery address (the order class sets
+  it to false), and the preview now shows the delivery address as "n/a", the
+  same as the confirmation email core actually sends for them. (Reported by
+  Scott C. Wilson.)
+
 v3.0.0 (2026-09-09)
 - Rewritten as an encapsulated zc_plugin. Install and uninstall through
   Modules > Plugin Manager; no files to copy, no SQL patch to run.

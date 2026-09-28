@@ -3,6 +3,17 @@
 All notable changes to this project are recorded here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [3.0.1] — 2026-09-28
+
+### Fixed
+
+- **Order Confirmation preview blanked on no-ship orders.** Pickup, virtual and
+  other orders with no delivery address have `order->delivery` set to `false`;
+  the checkout preview dereferenced `order->delivery['format_id']` and rendered a
+  blank page. It now shows the delivery address as `n/a`, matching what
+  `order::send_order_email()` sends for exactly those orders. Reported by
+  Scott C. Wilson.
+
 ## [3.0.0] — 2026-09-09
 
 A rewrite. Versions 1.x and 2.x, by Scott C. Wilson (That Software Guy), were
