@@ -3,6 +3,17 @@
 All notable changes to this project are recorded here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [3.0.2] — 2026-09-28
+
+### Changed
+
+- **Order Confirmation preview is now byte-for-byte identical to the sent email.**
+  The product row, the `"\n\t"` option/value attribute format, the one-time-charges
+  row and the totals now match `order::send_order_email()` exactly (two had quietly
+  diverged). A parity test reads `includes/classes/order.php` from a running store,
+  evaluates core's own markup expressions, and fails if the preview ever drifts —
+  verified identical across Zen Cart 1.5.8–3.0.0. Raised by Scott C. Wilson.
+
 ## [3.0.1] — 2026-09-28
 
 ### Fixed

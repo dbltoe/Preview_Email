@@ -54,7 +54,7 @@ $previewEmailScfHeader = static function (array &$notes): array {
     }
     $notes[] = 'Social Contact Footer sends this email with a blank header: it uses only a header image uploaded on Tools > Footer Newsletter Subscribers (its own page, not its Configuration settings), and none is. The banner shown here is a placeholder from Preview Email, not part of the real email.';
     return [
-        'EMAIL_LOGO_FILE' => HTTP_CATALOG_SERVER . DIR_WS_CATALOG . 'zc_plugins/PreviewEmail/v3.0.1/images/scf_header_placeholder.png',
+        'EMAIL_LOGO_FILE' => HTTP_CATALOG_SERVER . DIR_WS_CATALOG . 'zc_plugins/PreviewEmail/v3.0.2/images/scf_header_placeholder.png',
         'EMAIL_LOGO_ALT_TEXT' => 'Placeholder Header: no image is set for Social Contact Footer emails',
         'EMAIL_LOGO_ALT_TITLE_TEXT' => 'Placeholder Header: no image is set for Social Contact Footer emails',
         'EMAIL_LOGO_WIDTH' => '550',

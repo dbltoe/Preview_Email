@@ -68,10 +68,15 @@ return [
             $invoiceUrl = zen_catalog_href_link(defined('FILENAME_ACCOUNT_HISTORY_INFO') ? FILENAME_ACCOUNT_HISTORY_INFO : 'account_history_info', 'order_id=' . $oID, 'SSL', false);
             $dateOrdered = (isset($zcDate) && is_object($zcDate)) ? $zcDate->output(preview_email_const('DATE_FORMAT_LONG', '%A %d %B, %Y')) : date('l d F, Y');
 
-            // Products and totals, in the same markup the live email carries.
+            // Products and totals, byte-for-byte the markup order::send_order_email()
+            // builds (its products_ordered_html / products_ordered / $html_ot blocks,
+            // and the products_ordered_attributes format from create_add_products()).
+            // These are identical in every supported release; tests/core_parity_check.php
+            // pins them to the live order class so a core change is caught, not shown
+            // to the store owner as something the customer never actually receives.
             $productsHtml = '';
             $productsText = '';
-            $totalsHtml = '<tr><td class="order-totals-text" align="right" width="100%">&nbsp;</td><td class="order-totals-num" align="right" nowrap="nowrap">---------</td></tr>' . "\n";
+            $totalsHtml = '<tr><td class="order-totals-text" align="right" width="100%">' . '&nbsp;' . '</td> ' . "\n" . '<td class="order-totals-num" align="right" nowrap="nowrap">' . '---------' . '</td> </tr>' . "\n";
             $totalsText = '';
             if ($fake) {
                 foreach ($fake['products'] as $p) {
@@ -81,32 +86,42 @@ return [
                     $productsText .= $p['qty'] . ' x ' . $p['name'] . ' (' . $p['model'] . ') = ' . $p['price'] . "\n";
                 }
                 foreach ($fake['totals'] as $t) {
-                    $totalsHtml .= '<tr><td class="order-totals-text" align="right" width="100%">' . $t['title'] . '</td><td class="order-totals-num" align="right" nowrap="nowrap">' . $t['text'] . '</td></tr>' . "\n";
+                    $totalsHtml .= '<tr><td class="order-totals-text" align="right" width="100%">' . $t['title'] . '</td> ' . "\n" . '<td class="order-totals-num" align="right" nowrap="nowrap">' . $t['text'] . '</td> </tr>' . "\n";
                     $totalsText .= $t['title'] . ' ' . $t['text'] . "\n";
                 }
             } else {
                 foreach ($order->products as $p) {
+                    // Attributes exactly as order::create_add_products() accumulates
+                    // products_ordered_attributes: "\n\t" . option name . ' ' . value.
                     $attributes = '';
                     if (!empty($p['attributes']) && is_array($p['attributes'])) {
                         foreach ($p['attributes'] as $a) {
-                            $attributes .= '<br><nobr><small>&nbsp;<i> - ' . $a['option'] . ': ' . nl2br(zen_output_string_protected((string)$a['value']));
-                            if ((float)$a['price'] != 0) {
-                                $attributes .= ' (' . $a['prefix'] . $currencies->format((float)$a['price'] * (int)$p['qty'], true, $order->info['currency'], $order->info['currency_value']) . ')';
-                            }
-                            $attributes .= '</i></small></nobr>';
-                            $productsText .= '   - ' . $a['option'] . ': ' . $a['value'] . "\n";
+                            $attributes .= "\n\t" . $a['option'] . ' ' . zen_decode_specialchars((string)$a['value']);
                         }
                     }
-                    $price = $currencies->display_price($p['final_price'], $p['tax'], $p['qty']);
-                    $productsHtml .= '<tr>' . "\n"
-                        . '<td class="product-details" align="right" valign="top" width="30">' . $p['qty'] . '&nbsp;x</td>' . "\n"
-                        . '<td class="product-details" valign="top">' . nl2br((string)$p['name']) . ($p['model'] !== '' ? ' (' . nl2br((string)$p['model']) . ') ' : '') . "\n"
-                        . '<nobr><small><em> ' . nl2br($attributes) . '</em></small></nobr></td>' . "\n"
-                        . '<td class="product-details-num" valign="top" align="right">' . $price . '</td></tr>' . "\n";
-                    $productsText = $p['qty'] . ' x ' . $p['name'] . ($p['model'] !== '' ? ' (' . $p['model'] . ')' : '') . ' = ' . strip_tags((string)$price) . "\n" . $productsText;
+                    $model = (string)$p['model'];
+                    $onetime = (float)($p['onetime_charges'] ?? 0);
+
+                    $productsHtml .=
+                        '<tr>' . "\n" .
+                        '<td class="product-details" align="right" valign="top" width="30">' . $p['qty'] . '&nbsp;x</td>' . "\n" .
+                        '<td class="product-details" valign="top">' . nl2br((string)$p['name']) . ($model != '' ? ' (' . nl2br($model) . ') ' : '') .
+                        (!empty($attributes) ? "\n" . '<nobr>' . '<small><em>' . nl2br($attributes) . '</em></small>' . '</nobr>' : '') .
+                        '</td>' . "\n" .
+                        '<td class="product-details-num" valign="top" align="right">' .
+                        $currencies->display_price($p['final_price'], $p['tax'], $p['qty']) . '</td>' . "\n" . '</tr>' . "\n" .
+                        ($onetime != 0 ?
+                            '<tr>' . "\n" . '<td class="product-details" colspan="2">' . nl2br(TEXT_ONETIME_CHARGES_EMAIL) . '</td>' . "\n" .
+                            '<td valign="top" align="right">' . $currencies->display_price($onetime, $p['tax'], 1) . '</td>' . "\n" . '</tr>' . "\n" : '');
+
+                    $productsText .=
+                        $p['qty'] . ' x ' . (string)$p['name'] . ($model != '' ? ' (' . $model . ') ' : '') . ' = ' .
+                        $currencies->display_price($p['final_price'], $p['tax'], $p['qty']) .
+                        ($onetime != 0 ? "\n" . TEXT_ONETIME_CHARGES_EMAIL . $currencies->display_price($onetime, $p['tax'], 1) : '') .
+                        $attributes . "\n";
                 }
                 foreach ($order->totals as $t) {
-                    $totalsHtml .= '<tr><td class="order-totals-text" align="right" width="100%">' . $t['title'] . '</td><td class="order-totals-num" align="right" nowrap="nowrap">' . $t['text'] . '</td></tr>' . "\n";
+                    $totalsHtml .= '<tr><td class="order-totals-text" align="right" width="100%">' . $t['title'] . '</td> ' . "\n" . '<td class="order-totals-num" align="right" nowrap="nowrap">' . ($t['text']) . '</td> </tr>' . "\n";
                     $totalsText .= strip_tags((string)$t['title']) . ' ' . strip_tags((string)$t['text']) . "\n";
                 }
             }

@@ -1,5 +1,13 @@
 Preview Email - changelog
 
+v3.0.2 (2026-09-28)
+- Order Confirmation preview now reproduces the confirmation email byte-for-byte:
+  the product row, the option/value attribute lines, the one-time-charges row and
+  the totals, exactly as order::send_order_email() builds them (two places had
+  quietly diverged). A new test reads includes/classes/order.php from a running
+  store and fails if the preview ever stops matching core. (Raised by Scott C.
+  Wilson.)
+
 v3.0.1 (2026-09-28)
 - Order Confirmation preview no longer blanks on pickup, virtual and other
   no-ship orders. Those orders have no delivery address (the order class sets

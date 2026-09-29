@@ -1,0 +1,5 @@
+# Keep line endings LF everywhere, regardless of a contributor's core.autocrlf.
+# The plugin ships LF; a CRLF checkout on Windows previously slipped CRLF into
+# the package and tripped the tests.
+* text=auto eol=lf
+*.png binary
