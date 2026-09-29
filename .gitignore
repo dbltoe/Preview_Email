@@ -1,5 +1,5 @@
 dist/
-tests/
+/tests/
 tools/
 *.zip
 .DS_Store
