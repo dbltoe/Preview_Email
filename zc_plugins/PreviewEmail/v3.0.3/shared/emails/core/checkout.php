@@ -15,6 +15,120 @@ if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
+if (!function_exists('preview_email_checkout_render_from_order_class')) {
+    /**
+     * Render the checkout email's product rows, product text and order-totals rows
+     * from THIS store's own includes/classes/order.php, so a store that has
+     * customized the confirmation email -- a different product-line format, the model
+     * ahead of the name, and so on -- sees its real email in the preview instead of
+     * the stock layout. Returns null (and the caller falls back to the stock-faithful
+     * rendering) when the store's order.php matches stock (the common case: the proven
+     * path is used and nothing is evaluated), when it cannot be read, or on any
+     * extraction or evaluation problem.
+     *
+     * eval is used deliberately and narrowly: the only thing evaluated is a
+     * string-concatenation expression lifted out of the store's own, already-trusted
+     * includes/classes/order.php -- never any request input -- warnings are silenced
+     * for its duration, and any Throwable returns null. A store whose order.php matches
+     * stock never reaches it. tests/security_scan.php carries the matching exemption.
+     *
+     * @return array{html:string,text:string,totals_html:string}|null
+     */
+    function preview_email_checkout_render_from_order_class($order, $currencies): ?array
+    {
+        // The stock products_ordered_html block, whitespace-stripped, identical in
+        // every supported release (Zen Cart 1.5.8-3.0.0). A store matching it is
+        // unmodified, so we leave it to the stock-faithful rendering below.
+        $stockProductsHtml = 'c46f152c85050e898811184491fc3fc2';
+
+        if (!defined('DIR_FS_CATALOG')) {
+            return null;
+        }
+        $file = DIR_FS_CATALOG . 'includes/classes/order.php';
+        if (!is_file($file) || !is_readable($file)) {
+            return null;
+        }
+        $src = file_get_contents($file);
+        if ($src === false || $src === '') {
+            return null;
+        }
+
+        // Anchor each grab on the terminating ; at end of line: an HTML entity such
+        // as &nbsp; carries a ; of its own mid-expression.
+        $grab = static function (string $pattern) use ($src): ?string {
+            return preg_match($pattern, $src, $m) === 1 ? trim($m[1]) : null;
+        };
+        $rowExpr = $grab('~\$this->products_ordered_html\s*\.=(.*?);[ \t]*\r?\n~s');
+        if ($rowExpr === null) {
+            return null;
+        }
+        if (md5(preg_replace('~\s+~', '', $rowExpr)) === $stockProductsHtml) {
+            return null; // unmodified -> stock-faithful rendering, no eval
+        }
+
+        $textExpr = $grab('~\$this->products_ordered\s*\.=(.*?);[ \t]*\r?\n~s');
+        $attrExpr = $grab('~\$this->products_ordered_attributes\s*\.=\s*(.*?products_options_name.*?);[ \t]*\r?\n~s');
+        $totHead = $grab('~\$html_ot\s*=\s*(.*?);[ \t]*\r?\n~s');
+        $totRow = $grab('~\$html_ot\s*\.=\s*(.*?);[ \t]*\r?\n~s');
+        if ($textExpr === null || $totHead === null || $totRow === null) {
+            return null;
+        }
+
+        // Point the store's object references at the locals supplied below.
+        $swap = static function (string $e): string {
+            return str_replace(['$this->products[$i]', '$this->products_ordered_attributes'], ['$P', '$ATTR'], $e);
+        };
+        $rowExpr = $swap($rowExpr);
+        $textExpr = $swap($textExpr);
+        $totRow = str_replace('$order_totals[$i]', '$T', $totRow);
+        if ($attrExpr !== null) {
+            $attrExpr = str_replace(
+                ["\$attributes_values->fields['products_options_name']", "\$this->products[\$i]['attributes'][\$j]['value']"],
+                ['$OPTNAME', '$AVAL'],
+                $attrExpr
+            );
+        }
+        // Only a plain concatenation from order.php is evaluated; reject a backtick.
+        foreach ([$rowExpr, $textExpr, $totHead, $totRow, (string)$attrExpr] as $e) {
+            if (strpos($e, '`') !== false) {
+                return null;
+            }
+        }
+
+        $defaults = ['qty' => 0, 'name' => '', 'model' => '', 'final_price' => 0, 'tax' => 0, 'onetime_charges' => 0, 'attributes' => []];
+        set_error_handler(static function (): bool {
+            return true; // silence a key this store's stored order does not carry
+        });
+        try {
+            $html = '';
+            $text = '';
+            foreach ((array)$order->products as $product) {
+                $P = array_merge($defaults, (array)$product);
+                $ATTR = '';
+                if ($attrExpr !== null && !empty($P['attributes']) && is_array($P['attributes'])) {
+                    foreach ($P['attributes'] as $a) {
+                        $OPTNAME = (string)($a['option'] ?? '');
+                        $AVAL = (string)($a['value'] ?? '');
+                        $ATTR .= eval('return ' . $attrExpr . ';');
+                    }
+                }
+                $html .= eval('return ' . $rowExpr . ';');
+                $text .= eval('return ' . $textExpr . ';');
+            }
+            $totHtml = eval('return ' . $totHead . ';');
+            foreach ((array)$order->totals as $T) {
+                $totHtml .= eval('return ' . $totRow . ';');
+            }
+            $result = ['html' => $html, 'text' => $text, 'totals_html' => $totHtml];
+        } catch (\Throwable $e) {
+            $result = null;
+        } finally {
+            restore_error_handler();
+        }
+        return $result;
+    }
+}
+
 $previewEmailGroupCore = preview_email_const('PREVIEW_EMAIL_GROUP_CORE', 'Zen Cart');
 
 return [
@@ -90,39 +204,54 @@ return [
                     $totalsText .= $t['title'] . ' ' . $t['text'] . "\n";
                 }
             } else {
-                foreach ($order->products as $p) {
-                    // Attributes exactly as order::create_add_products() accumulates
-                    // products_ordered_attributes: "\n\t" . option name . ' ' . value.
-                    $attributes = '';
-                    if (!empty($p['attributes']) && is_array($p['attributes'])) {
-                        foreach ($p['attributes'] as $a) {
-                            $attributes .= "\n\t" . $a['option'] . ' ' . zen_decode_specialchars((string)$a['value']);
-                        }
+                $live = function_exists('preview_email_checkout_render_from_order_class')
+                    ? preview_email_checkout_render_from_order_class($order, $currencies)
+                    : null;
+                if ($live !== null) {
+                    // This store's order.php builds the email differently from stock;
+                    // show its real output rather than the stock layout.
+                    $productsHtml = $live['html'];
+                    $productsText = $live['text'];
+                    $totalsHtml = $live['totals_html'];
+                    foreach ($order->totals as $t) {
+                        $totalsText .= strip_tags((string)$t['title']) . ' ' . strip_tags((string)$t['text']) . "\n";
                     }
-                    $model = (string)$p['model'];
-                    $onetime = (float)($p['onetime_charges'] ?? 0);
+                    $notes[] = preview_email_const('PREVIEW_EMAIL_NOTE_FROM_ORDER_CLASS', 'This store\'s includes/classes/order.php builds the order email differently from stock Zen Cart, so the product and totals rows shown here are rendered from your order.php, not the stock layout.');
+                } else {
+                    foreach ($order->products as $p) {
+                        // Attributes exactly as order::create_add_products() accumulates
+                        // products_ordered_attributes: "\n\t" . option name . ' ' . value.
+                        $attributes = '';
+                        if (!empty($p['attributes']) && is_array($p['attributes'])) {
+                            foreach ($p['attributes'] as $a) {
+                                $attributes .= "\n\t" . $a['option'] . ' ' . zen_decode_specialchars((string)$a['value']);
+                            }
+                        }
+                        $model = (string)$p['model'];
+                        $onetime = (float)($p['onetime_charges'] ?? 0);
 
-                    $productsHtml .=
-                        '<tr>' . "\n" .
-                        '<td class="product-details" align="right" valign="top" width="30">' . $p['qty'] . '&nbsp;x</td>' . "\n" .
-                        '<td class="product-details" valign="top">' . nl2br((string)$p['name']) . ($model != '' ? ' (' . nl2br($model) . ') ' : '') .
-                        (!empty($attributes) ? "\n" . '<nobr>' . '<small><em>' . nl2br($attributes) . '</em></small>' . '</nobr>' : '') .
-                        '</td>' . "\n" .
-                        '<td class="product-details-num" valign="top" align="right">' .
-                        $currencies->display_price($p['final_price'], $p['tax'], $p['qty']) . '</td>' . "\n" . '</tr>' . "\n" .
-                        ($onetime != 0 ?
-                            '<tr>' . "\n" . '<td class="product-details" colspan="2">' . nl2br(TEXT_ONETIME_CHARGES_EMAIL) . '</td>' . "\n" .
-                            '<td valign="top" align="right">' . $currencies->display_price($onetime, $p['tax'], 1) . '</td>' . "\n" . '</tr>' . "\n" : '');
+                        $productsHtml .=
+                            '<tr>' . "\n" .
+                            '<td class="product-details" align="right" valign="top" width="30">' . $p['qty'] . '&nbsp;x</td>' . "\n" .
+                            '<td class="product-details" valign="top">' . nl2br((string)$p['name']) . ($model != '' ? ' (' . nl2br($model) . ') ' : '') .
+                            (!empty($attributes) ? "\n" . '<nobr>' . '<small><em>' . nl2br($attributes) . '</em></small>' . '</nobr>' : '') .
+                            '</td>' . "\n" .
+                            '<td class="product-details-num" valign="top" align="right">' .
+                            $currencies->display_price($p['final_price'], $p['tax'], $p['qty']) . '</td>' . "\n" . '</tr>' . "\n" .
+                            ($onetime != 0 ?
+                                '<tr>' . "\n" . '<td class="product-details" colspan="2">' . nl2br(TEXT_ONETIME_CHARGES_EMAIL) . '</td>' . "\n" .
+                                '<td valign="top" align="right">' . $currencies->display_price($onetime, $p['tax'], 1) . '</td>' . "\n" . '</tr>' . "\n" : '');
 
-                    $productsText .=
-                        $p['qty'] . ' x ' . (string)$p['name'] . ($model != '' ? ' (' . $model . ') ' : '') . ' = ' .
-                        $currencies->display_price($p['final_price'], $p['tax'], $p['qty']) .
-                        ($onetime != 0 ? "\n" . TEXT_ONETIME_CHARGES_EMAIL . $currencies->display_price($onetime, $p['tax'], 1) : '') .
-                        $attributes . "\n";
-                }
-                foreach ($order->totals as $t) {
-                    $totalsHtml .= '<tr><td class="order-totals-text" align="right" width="100%">' . $t['title'] . '</td> ' . "\n" . '<td class="order-totals-num" align="right" nowrap="nowrap">' . ($t['text']) . '</td> </tr>' . "\n";
-                    $totalsText .= strip_tags((string)$t['title']) . ' ' . strip_tags((string)$t['text']) . "\n";
+                        $productsText .=
+                            $p['qty'] . ' x ' . (string)$p['name'] . ($model != '' ? ' (' . $model . ') ' : '') . ' = ' .
+                            $currencies->display_price($p['final_price'], $p['tax'], $p['qty']) .
+                            ($onetime != 0 ? "\n" . TEXT_ONETIME_CHARGES_EMAIL . $currencies->display_price($onetime, $p['tax'], 1) : '') .
+                            $attributes . "\n";
+                    }
+                    foreach ($order->totals as $t) {
+                        $totalsHtml .= '<tr><td class="order-totals-text" align="right" width="100%">' . $t['title'] . '</td> ' . "\n" . '<td class="order-totals-num" align="right" nowrap="nowrap">' . ($t['text']) . '</td> </tr>' . "\n";
+                        $totalsText .= strip_tags((string)$t['title']) . ' ' . strip_tags((string)$t['text']) . "\n";
+                    }
                 }
             }
 

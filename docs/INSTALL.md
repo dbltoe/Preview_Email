@@ -8,9 +8,9 @@
 
 ## Install
 
-1. Unzip the package. Inside is a `zc_plugins/PreviewEmail/v3.0.2/` directory.
+1. Unzip the package. Inside is a `zc_plugins/PreviewEmail/v3.0.3/` directory.
 2. Upload `zc_plugins/PreviewEmail/` into your store's `zc_plugins/` directory,
-   so that `zc_plugins/PreviewEmail/v3.0.2/manifest.php` exists on the server.
+   so that `zc_plugins/PreviewEmail/v3.0.3/manifest.php` exists on the server.
 3. In admin, open **Modules > Plugin Manager**. Preview Email appears in the
    list as Not Installed. Select it and press **Install**.
 4. The page is now at **Tools > Preview Email**.
@@ -43,7 +43,7 @@ delete the old files; they are dead weight.
 ## Upgrading 3.0.0 to a Later 3.x
 
 Upload the new version directory alongside the old one
-(`zc_plugins/PreviewEmail/v3.0.2/` next to `v3.0.0/`), then in Plugin Manager
+(`zc_plugins/PreviewEmail/v3.0.3/` next to `v3.0.0/`), then in Plugin Manager
 select Preview Email and press **Upgrade**. After it reports success, delete
 the old version directory. Re-running the installer is safe; every step is
 idempotent.

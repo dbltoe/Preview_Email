@@ -83,6 +83,7 @@ $define = [
 
     /* notes the builders add */
     'PREVIEW_EMAIL_NOTE_NO_ORDERS' => 'This store has no orders yet, so the order shown is invented.',
+    'PREVIEW_EMAIL_NOTE_FROM_ORDER_CLASS' => 'This store\'s includes/classes/order.php builds the order email differently from stock Zen Cart, so the product and totals rows shown here are rendered from your order.php, not the stock layout.',
     'PREVIEW_EMAIL_NOTE_EXTRA_COPY' => 'This is the copy the store receives, with the extra-info block core adds to admin copies.',
     'PREVIEW_EMAIL_NOTE_DIRECT_FILE' => 'Message body read from %s.',
 

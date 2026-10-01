@@ -3,6 +3,19 @@
 All notable changes to this project are recorded here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [3.0.3] — 2026-09-30
+
+### Added
+
+- **Order Confirmation preview reflects a customized `order.php`.** When a store has
+  changed how `includes/classes/order.php` builds the confirmation email — say a
+  wholesale store that leads each line with the model/SKU — the preview now renders
+  the product and totals rows from the store's own `order.php` rather than the stock
+  layout, so what you see matches what the store sends. Done by reading the store's
+  own `order.php` and evaluating its line-building expressions, gated so a stock store
+  is untouched (stock-faithful rendering, nothing evaluated) and with a hard fallback
+  to that rendering on any problem. Raised by Scott C. Wilson.
+
 ## [3.0.2] — 2026-09-28
 
 ### Changed

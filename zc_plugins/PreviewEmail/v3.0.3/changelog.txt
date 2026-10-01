@@ -1,5 +1,13 @@
 Preview Email - changelog
 
+v3.0.3 (2026-09-30)
+- Order Confirmation preview now reflects a customized includes/classes/order.php.
+  When a store has changed how order.php builds the confirmation email (for example a
+  wholesale store that leads each line with the product's model/SKU), the preview
+  renders the product and totals rows from the store's own order.php, so it matches
+  what the store actually sends. A store on stock Zen Cart is unaffected and uses the
+  stock-faithful rendering. (Raised by Scott C. Wilson.)
+
 v3.0.2 (2026-09-28)
 - Order Confirmation preview now reproduces the confirmation email byte-for-byte:
   the product row, the option/value attribute lines, the one-time-charges row and
