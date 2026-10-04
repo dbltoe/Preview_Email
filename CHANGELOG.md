@@ -11,10 +11,24 @@ All notable changes to this project are recorded here. This project follows
   changed how `includes/classes/order.php` builds the confirmation email — say a
   wholesale store that leads each line with the model/SKU — the preview now renders
   the product and totals rows from the store's own `order.php` rather than the stock
-  layout, so what you see matches what the store sends. Done by reading the store's
-  own `order.php` and evaluating its line-building expressions, gated so a stock store
-  is untouched (stock-faithful rendering, nothing evaluated) and with a hard fallback
-  to that rendering on any problem. Raised by Scott C. Wilson.
+  layout, so what you see matches what the store sends. A stock store is unaffected
+  and stays on the standard layout; a store whose `order.php` differs has its own
+  layout shown instead, with a hard fallback to the standard layout if that cannot
+  be produced. Raised by Scott C. Wilson.
+
+### Known limitation
+
+- **The customized-`order.php` rendering does not catch every customization.**
+  The reader follows a straightforward change to the product and totals rows, but
+  a store that builds those rows in a shape it cannot follow falls back to the
+  stock-faithful layout — so for some customizations the preview shows the stock
+  rows rather than the store's own. It fails safe, never showing something the
+  customer would not receive, but it can quietly under-report a customization, so
+  treat a stock-looking preview on a customized store as "could not read your
+  change," not "your change is wrong." The durable fix is to have the preview call
+  the store's own code directly instead of reading it — a proposed core change,
+  zencart/zencart#8015 — and when that lands this reader is retired. Surfaced by
+  Scott C. Wilson.
 
 ## [3.0.2] — 2026-09-28
 
