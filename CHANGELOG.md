@@ -16,7 +16,7 @@ All notable changes to this project are recorded here. This project follows
   layout shown instead, with a hard fallback to the standard layout if that cannot
   be produced. Raised by Scott C. Wilson.
 
-### Known limitation
+### Known Limitation
 
 - **The customized-`order.php` rendering does not catch every customization.**
   The reader follows a straightforward change to the product and totals rows, but
