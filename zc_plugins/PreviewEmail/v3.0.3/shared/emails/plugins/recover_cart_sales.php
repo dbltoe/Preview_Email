@@ -29,8 +29,8 @@ $previewEmailRcsBasket = static function (): array {
     global $db;
     $customer = preview_email_sample_customer();
     $items = [];
-    if (isset($db) && defined('TABLE_CUSTOMERS_BASKET') && defined('TABLE_PRODUCTS') && defined('TABLE_PRODUCTS_DESCRIPTION')) {
-        $r = $db->Execute("SELECT customers_id FROM " . TABLE_CUSTOMERS_BASKET . " ORDER BY customers_basket_date_added DESC LIMIT " . (int)PREVIEW_EMAIL_LOOKBACK);
+    if (isset($db) && defined('TABLE_CUSTOMERS_BASKET') && defined('TABLE_CUSTOMERS') && defined('TABLE_PRODUCTS') && defined('TABLE_PRODUCTS_DESCRIPTION')) {
+        $r = $db->Execute("SELECT cb.customers_id FROM " . TABLE_CUSTOMERS_BASKET . " cb JOIN " . TABLE_CUSTOMERS . " c ON c.customers_id = cb.customers_id WHERE " . preview_email_customer_filter('c') . " ORDER BY cb.customers_basket_date_added DESC LIMIT " . (int)PREVIEW_EMAIL_LOOKBACK);
         if (!$r->EOF) {
             $cid = (int)preview_email_advance($r)->fields['customers_id'];
             $c = $db->Execute("SELECT customers_firstname, customers_lastname, customers_email_address FROM " . TABLE_CUSTOMERS . " WHERE customers_id = " . (int)$cid . " LIMIT 1");

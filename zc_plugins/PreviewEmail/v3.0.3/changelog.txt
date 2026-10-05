@@ -1,5 +1,14 @@
 Preview Email - changelog
 
+v3.0.4 (unreleased)
+- Previews are no longer addressed to One Page Checkout's guest placeholder
+  ("Guest Customer, **do not remove**", no email address), which showed as
+  "To: Guest Customer, **do not remove** <>" with a blank address in the body.
+  The sample customer now skips customers with a blank email address and the
+  placeholder itself; a store with no one else still gets the invented Sample
+  Customer. The Recover Cart Sales reminders apply the same rule. Order
+  previews were never affected.
+
 v3.0.3 (2026-09-30)
 - Order Confirmation preview now reflects a customized includes/classes/order.php.
   When a store has changed how order.php builds the confirmation email (for example a

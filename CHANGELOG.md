@@ -3,6 +3,22 @@
 All notable changes to this project are recorded here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [3.0.4] — Unreleased
+
+### Fixed
+
+- **Previews could be addressed to One Page Checkout's guest placeholder.** On a
+  store running One Page Checkout, the sample customer was drawn from the newest
+  customers, a pool that includes OPC's guest placeholder ("Guest Customer,
+  \*\*do not remove\*\*", which has no email address). When it was picked, the
+  preview read `To: Guest Customer, **do not remove** <>` with a blank address in
+  the body. The sample customer now skips any customer with a blank email address
+  and, when `CHECKOUT_ONE_GUEST_CUSTOMER_ID` is set, the placeholder itself; a
+  store with no one else still gets the invented Sample Customer. The Recover Cart
+  Sales reminders, which take their customer from a saved cart, apply the same
+  rule. Order previews were never affected, since they read the customer's name
+  and address from the order.
+
 ## [3.0.3] — 2026-09-30
 
 ### Added

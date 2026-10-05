@@ -556,6 +556,25 @@ function preview_email_advance(object $result): object
 }
 
 /**
+ * The WHERE condition a sample customer must meet: an email address to
+ * show, and not One Page Checkout's guest placeholder, the customers row
+ * (named "Guest Customer, **do not remove**", with no address) that OPC
+ * files every guest checkout under.
+ *
+ * @param string $alias  the customers table alias in the query, if any
+ */
+function preview_email_customer_filter(string $alias = ''): string
+{
+    $col = ($alias === '') ? '' : $alias . '.';
+    $where = "TRIM(" . $col . "customers_email_address) <> ''";
+    $guest = defined('CHECKOUT_ONE_GUEST_CUSTOMER_ID') ? (int)CHECKOUT_ONE_GUEST_CUSTOMER_ID : 0;
+    if ($guest > 0) {
+        $where .= " AND " . $col . "customers_id <> " . $guest;
+    }
+    return $where;
+}
+
+/**
  * A recent customer, or an invented one when the store has none.
  *
  * @return array{id: int, firstname: string, lastname: string, name: string, email: string, telephone: string, real: bool}
@@ -580,6 +599,7 @@ function preview_email_sample_customer(): array
         $r = $db->Execute(
             "SELECT customers_id, customers_firstname, customers_lastname, customers_email_address, customers_telephone
                FROM " . TABLE_CUSTOMERS . "
+              WHERE " . preview_email_customer_filter() . "
               ORDER BY customers_id DESC
               LIMIT " . (int)PREVIEW_EMAIL_LOOKBACK
         );
