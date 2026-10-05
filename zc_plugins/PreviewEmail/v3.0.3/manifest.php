@@ -51,16 +51,12 @@ $previewEmailLinks =
     . '<a href="' . $previewEmailGithubUrl . '" target="_blank" rel="noopener noreferrer"'
     . ' class="btn btn-primary" role="button"'
     . ' style="margin:0 ' . $previewEmailButtonGap . ' 0 0">GitHub</a>'
+    . ($previewEmailForumUrl !== ''
+        ? '<a href="' . $previewEmailForumUrl . '" target="_blank" rel="noopener noreferrer"'
+          . ' class="btn btn-primary" role="button"'
+          . ' style="margin:0 ' . $previewEmailButtonGap . ' 0 0">Forum Support Thread</a>'
+        : '')
     . '</div>';
-
-$previewEmailForumLink = '';
-if ($previewEmailForumUrl !== '') {
-    $previewEmailForumLink =
-        '<div style="margin:8px 0 0;padding:0 0 0 ' . $previewEmailButtonGap . '">'
-        . '<a href="' . $previewEmailForumUrl . '" target="_blank" rel="noopener noreferrer">'
-        . 'Forum Support Thread</a>'
-        . '</div>';
-}
 
 return [
     'pluginVersion' => 'v3.0.3',
@@ -70,8 +66,7 @@ return [
         . 'products, as HTML or as the plain-text part, and send yourself a test in either format. '
         . 'Covers all of Zen Cart\'s own emails, finds the emails your add-ons send, and lists any '
         . 'template file nothing claims. Tools &gt; Preview Email.'
-        . $previewEmailLinks
-        . $previewEmailForumLink,
+        . $previewEmailLinks,
     // Shown as the Author in Plugin Manager, and stored in
     // plugin_control.author / plugin_control_versions.author (varchar(64)).
     'pluginAuthor' => 'My Zen Cart Host (dbltoe)',
