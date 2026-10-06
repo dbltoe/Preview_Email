@@ -99,6 +99,8 @@ if ($previewEmailAction === 'preview' || $previewEmailAction === 'send') {
         $messageStack->add_session(zen_output_string_protected($availability), 'warning');
         zen_redirect(zen_href_link(FILENAME_PREVIEW_EMAIL, '', 'SSL'));
     }
+    // Opt-in exact send-path view, honored only for the Order Confirmation.
+    $GLOBALS['preview_email_exact_capture'] = ($previewEmailAction === 'preview' && $key === 'checkout' && isset($_POST['exact']) && $_POST['exact'] === '1');
     $message = preview_email_build($def);
 
     if ($previewEmailAction === 'preview') {
@@ -266,6 +268,7 @@ echo (string)$previewEmailPageTop;
         <input type="hidden" name="action" id="pe-action" value="preview">
         <input type="hidden" name="email" id="pe-email" value="">
         <input type="hidden" name="part" id="pe-part" value="html">
+        <input type="hidden" name="exact" id="pe-exact" value="">
 
         <div class="pe-send">
             <strong><?= PREVIEW_EMAIL_SEND_HEADING; ?></strong>
@@ -320,6 +323,9 @@ echo (string)$previewEmailPageTop;
                         <td class="pe-actions">
                             <?php if ($on) { ?>
                             <button type="submit" class="btn btn-default btn-xs" data-pe-email="<?= zen_output_string_protected($key); ?>" data-pe-action="preview" data-pe-part="html"><?= PREVIEW_EMAIL_BTN_HTML; ?></button>
+                            <?php if ($key === 'checkout') { ?>
+                            <button type="submit" class="btn btn-default btn-xs" data-pe-email="<?= zen_output_string_protected($key); ?>" data-pe-action="preview" data-pe-part="html" data-pe-exact="1" title="<?= zen_output_string_protected(PREVIEW_EMAIL_NOTE_EXACT_CAPTURE); ?>"><?= PREVIEW_EMAIL_BTN_HTML_EXACT; ?></button>
+                            <?php } ?>
                             <button type="submit" class="btn btn-default btn-xs" data-pe-email="<?= zen_output_string_protected($key); ?>" data-pe-action="preview" data-pe-part="text"><?= PREVIEW_EMAIL_BTN_TEXT; ?></button>
                             <button type="submit" class="btn btn-primary btn-xs" data-pe-email="<?= zen_output_string_protected($key); ?>" data-pe-action="send" data-pe-part="html"<?= $previewEmailSendOn ? '' : ' disabled'; ?>><?= PREVIEW_EMAIL_BTN_SEND; ?></button>
                             <?php } else { ?>
@@ -355,6 +361,7 @@ echo (string)$previewEmailPageTop;
         document.getElementById('pe-email').value = button.getAttribute('data-pe-email');
         document.getElementById('pe-action').value = button.getAttribute('data-pe-action');
         document.getElementById('pe-part').value = button.getAttribute('data-pe-part');
+        document.getElementById('pe-exact').value = button.getAttribute('data-pe-exact') || '';
         form.target = (button.getAttribute('data-pe-action') === 'send') ? '_self' : '_blank';
     });
 }());

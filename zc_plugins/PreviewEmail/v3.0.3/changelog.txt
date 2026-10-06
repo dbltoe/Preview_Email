@@ -1,6 +1,12 @@
 Preview Email - changelog
 
 v3.0.4 (unreleased)
+- New opt-in "HTML (Exact)" button on the Order Confirmation row. It renders the
+  email by running the store's own order email code and capturing exactly what it
+  would send (no email is sent), so it reflects any customization in that code. It
+  runs the store's live send path, which also fires the order-email notifier events,
+  so it is a separate, deliberate button rather than the default; the standard
+  preview, and every other email, are unchanged.
 - Previews are no longer addressed to One Page Checkout's guest placeholder
   ("Guest Customer, **do not remove**", no email address), which showed as
   "To: Guest Customer, **do not remove** <>" with a blank address in the body.

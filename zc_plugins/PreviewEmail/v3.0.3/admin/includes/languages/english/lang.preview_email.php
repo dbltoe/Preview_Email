@@ -40,6 +40,7 @@ $define = [
     'PREVIEW_EMAIL_BTN_HTML' => 'Preview HTML',
     'PREVIEW_EMAIL_BTN_TEXT' => 'Preview Text',
     'PREVIEW_EMAIL_BTN_SEND' => 'Send Test',
+    'PREVIEW_EMAIL_BTN_HTML_EXACT' => 'HTML (Exact)',
     'PREVIEW_EMAIL_TEMPLATE_FALLBACK' => '(no template of its own; the default is used)',
 
     /* groups and generic entries */
@@ -84,6 +85,8 @@ $define = [
     /* notes the builders add */
     'PREVIEW_EMAIL_NOTE_NO_ORDERS' => 'This store has no orders yet, so the order shown is invented.',
     'PREVIEW_EMAIL_NOTE_FROM_ORDER_CLASS' => 'This store\'s includes/classes/order.php builds the order email differently from stock Zen Cart, so the product and totals rows shown here are rendered from your order.php, not the stock layout.',
+    'PREVIEW_EMAIL_NOTE_EXACT_CAPTURE' => 'This preview was produced by running this store\'s own order-email code (order::send_order_email) and capturing exactly what it would send; no email was sent. It reflects customizations in that code. Because it runs the live send path, it also fires the order-email notifier events, so any other plugin listening on those runs during this preview.',
+    'PREVIEW_EMAIL_NOTE_EXACT_CAPTURE_FAILED' => 'The exact send-path preview could not be produced for this order, so the standard preview is shown instead.',
     'PREVIEW_EMAIL_NOTE_EXTRA_COPY' => 'This is the copy the store receives, with the extra-info block core adds to admin copies.',
     'PREVIEW_EMAIL_NOTE_DIRECT_FILE' => 'Message body read from %s.',
 

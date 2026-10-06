@@ -5,6 +5,20 @@ All notable changes to this project are recorded here. This project follows
 
 ## [3.0.4] — Unreleased
 
+### Added
+
+- **Exact send-path preview of the Order Confirmation (opt-in).** A new "HTML
+  (Exact)" button on the Order Confirmation row renders the email by running the
+  store's own `order::send_order_email()` for a recent order and capturing exactly
+  what it would send — no email is sent. It reflects any customization in that
+  code; its product rows come from the store's own
+  `order::buildProductOrderedEmailStrings()` where core provides it (the method
+  proposed in zencart/zencart#8015), and from the stock layout otherwise. Because
+  it runs the live send path it also fires the order-email notifier events, so any
+  other plugin listening on those runs during the preview — which is why it is a
+  separate, explicit button rather than the default. The standard preview, and
+  every other email, are unchanged.
+
 ### Fixed
 
 - **Previews could be addressed to One Page Checkout's guest placeholder.** On a

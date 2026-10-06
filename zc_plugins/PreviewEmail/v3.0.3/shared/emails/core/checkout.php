@@ -129,6 +129,160 @@ if (!function_exists('preview_email_checkout_render_from_order_class')) {
     }
 }
 
+if (!function_exists('preview_email_checkout_capture')) {
+    /**
+     * Opt-in "exact send-path" render: run this store's own
+     * order::send_order_email() for a stored order and capture exactly what it
+     * would send, with every send suppressed by the capture observer. Returns
+     * ['text' => string, 'html' => array (the HTML block array)], or null if
+     * nothing was captured (e.g. the order could not be driven).
+     *
+     * No eval and no scraping. The product rows are built from the store's own
+     * order method when core provides it (buildProductOrderedEmailStrings, the
+     * read-only method proposed in zencart/zencart#8015), else from the stock
+     * layout; everything else -- intro, totals, payment, disclaimer, and any
+     * customization inside send_order_email() itself -- comes straight from core.
+     *
+     * The delivery/billing address and the payment line are overwritten from the
+     * stored order afterwards, because send_order_email() sources them from the
+     * live address book via the checkout session, which a stored order lacks.
+     */
+    function preview_email_checkout_capture($order, int $oID, $currencies): ?array
+    {
+        if (!is_object($order) || empty($order->products) || !method_exists($order, 'send_order_email')) {
+            return null;
+        }
+
+        // send_order_email() uses raw base-catalog language constants (e.g.
+        // HEADING_ADDRESS_INFORMATION, PAYMENT_METHOD_GV) that the admin preview
+        // context does not load on its own. Pull in the main catalog language so
+        // those constants exist; the per-page checkout_process/email_extras files
+        // the builder already loaded fill in the rest.
+        if (function_exists('preview_email_load_language_file') && defined('DIR_FS_CATALOG')) {
+            preview_email_load_language_file(DIR_FS_CATALOG . 'includes/languages/', 'english');
+        }
+
+        // 1) Build products_ordered_html / products_ordered with no side effects.
+        $order->products_ordered = '';
+        $order->products_ordered_html = '';
+        $useMethod = method_exists($order, 'buildProductOrderedEmailStrings');
+        foreach ((array)$order->products as $product) {
+            $p = array_merge(['qty' => 0, 'name' => '', 'model' => '', 'final_price' => 0, 'tax' => 0, 'onetime_charges' => 0, 'attributes' => []], (array)$product);
+            $attributes = '';
+            if (!empty($p['attributes']) && is_array($p['attributes'])) {
+                foreach ($p['attributes'] as $a) {
+                    $attributes .= "\n\t" . ($a['option'] ?? '') . ' ' . zen_decode_specialchars((string)($a['value'] ?? ''));
+                }
+            }
+            if ($useMethod) {
+                $line = $order->buildProductOrderedEmailStrings($p, $attributes, $currencies);
+                $order->products_ordered .= $line['text'];
+                $order->products_ordered_html .= $line['html'];
+                continue;
+            }
+            $model = (string)$p['model'];
+            $onetime = (float)$p['onetime_charges'];
+            $order->products_ordered_html .=
+                '<tr>' . "\n" .
+                '<td class="product-details" align="right" valign="top" width="30">' . $p['qty'] . '&nbsp;x</td>' . "\n" .
+                '<td class="product-details" valign="top">' . nl2br((string)$p['name']) . ($model != '' ? ' (' . nl2br($model) . ') ' : '') .
+                (!empty($attributes) ? "\n" . '<nobr>' . '<small><em>' . nl2br($attributes) . '</em></small>' . '</nobr>' : '') .
+                '</td>' . "\n" .
+                '<td class="product-details-num" valign="top" align="right">' .
+                $currencies->display_price($p['final_price'], $p['tax'], $p['qty']) . '</td>' . "\n" . '</tr>' . "\n" .
+                ($onetime != 0 ?
+                    '<tr>' . "\n" . '<td class="product-details" colspan="2">' . nl2br(TEXT_ONETIME_CHARGES_EMAIL) . '</td>' . "\n" .
+                    '<td valign="top" align="right">' . $currencies->display_price($onetime, $p['tax'], 1) . '</td>' . "\n" . '</tr>' . "\n" : '');
+            $order->products_ordered .=
+                $p['qty'] . ' x ' . (string)$p['name'] . ($model != '' ? ' (' . $model . ') ' : '') . ' = ' .
+                $currencies->display_price($p['final_price'], $p['tax'], $p['qty']) .
+                ($onetime != 0 ? "\n" . TEXT_ONETIME_CHARGES_EMAIL . $currencies->display_price($onetime, $p['tax'], 1) : '') .
+                $attributes . "\n";
+        }
+
+        // 2) Fabricate the global + session values send_order_email() reads,
+        //    saving the real ones so the admin request is left untouched.
+        global $order_totals;
+        $savedTotals = $order_totals ?? null;
+        $order_totals = [];
+        foreach ((array)$order->totals as $t) {
+            $order_totals[] = ['title' => $t['title'] ?? '', 'text' => $t['text'] ?? ''];
+        }
+        $savedSession = [];
+        foreach (['customer_id', 'sendto', 'billto', 'payment'] as $k) {
+            $savedSession[$k] = $_SESSION[$k] ?? null;
+        }
+        $_SESSION['customer_id'] = (int)($order->customer['id'] ?? 0);
+        $_SESSION['sendto'] = null;   // addresses are overwritten from the stored order below
+        $_SESSION['billto'] = null;
+        $_SESSION['payment'] = '';    // falls through to the plain payment title
+
+        $restore = static function () use (&$order_totals, $savedTotals, $savedSession) {
+            $order_totals = $savedTotals;
+            foreach ($savedSession as $k => $v) {
+                if ($v === null) { unset($_SESSION[$k]); } else { $_SESSION[$k] = $v; }
+            }
+        };
+
+        // A loaded order's customer/info arrays do not carry every key that
+        // checkout-time send_order_email() reads; backfill the ones it needs so
+        // running it against a stored order neither warns nor fails.
+        if (!isset($order->customer['firstname']) || !isset($order->customer['lastname'])) {
+            $nm = trim((string)($order->customer['name'] ?? ''));
+            $sp = strrpos($nm, ' ');
+            $order->customer['firstname'] = ($sp === false) ? $nm : substr($nm, 0, $sp);
+            $order->customer['lastname'] = ($sp === false) ? '' : substr($nm, $sp + 1);
+        }
+        if (!isset($order->customer['telephone'])) { $order->customer['telephone'] = ''; }
+        if (!isset($order->customer['email_address'])) { $order->customer['email_address'] = ''; }
+        if (!isset($order->info['comments'])) { $order->info['comments'] = ''; }
+        if (!isset($order->info['shipping_module_code'])) { $order->info['shipping_module_code'] = ''; }
+        if (!isset($order->info['shipping_method'])) { $order->info['shipping_method'] = ''; }
+        if (!isset($order->content_type)) { $order->content_type = 'physical'; }
+
+        // 3) Run the real send path with sends suppressed, then read the capture.
+        //    Running core against a loaded order raises benign undefined-key
+        //    notices (a stored order's arrays differ from the checkout-time
+        //    shape, and the addresses it computes are discarded below in favor
+        //    of the stored order's), so silence notices for the duration rather
+        //    than fill the store's debug log on every preview. A real failure
+        //    still throws and is caught, falling back to the standard preview.
+        preview_email_capture_arm();
+        set_error_handler(static function (): bool {
+            return true;
+        });
+        try {
+            $order->send_order_email($oID);
+        } catch (\Throwable $e) {
+            restore_error_handler();
+            preview_email_capture_disarm();
+            $restore();
+            return null;
+        }
+        restore_error_handler();
+        $captured = preview_email_capture_result();
+        preview_email_capture_disarm();
+        $restore();
+
+        if ($captured === null) {
+            return null;
+        }
+
+        // 4) Correct the address + payment blocks from the stored order.
+        $html = $captured['html'];
+        $html['ADDRESS_DELIVERY_DETAIL'] = (empty($order->delivery) || !is_array($order->delivery))
+            ? 'n/a'
+            : zen_address_format($order->delivery['format_id'], $order->delivery, 1, '', '<br>');
+        if (!empty($order->billing) && is_array($order->billing)) {
+            $html['ADDRESS_BILLING_DETAIL'] = zen_address_format($order->billing['format_id'], $order->billing, 1, '', '<br>');
+        }
+        if (!empty($order->info['payment_method'])) {
+            $html['PAYMENT_METHOD_DETAIL'] = (string)$order->info['payment_method'];
+        }
+        return ['text' => $captured['text'], 'html' => $html];
+    }
+}
+
 $previewEmailGroupCore = preview_email_const('PREVIEW_EMAIL_GROUP_CORE', 'Zen Cart');
 
 return [
@@ -172,6 +326,26 @@ return [
                 ];
             } else {
                 $fake = null;
+            }
+
+            // Opt-in exact view: render precisely what order::send_order_email()
+            // would send for this stored order by running it and capturing the
+            // result (no mail is sent). Falls through to the standard build if
+            // capture is not requested or could not be produced.
+            if (!$fake && function_exists('preview_email_exact_capture_requested') && preview_email_exact_capture_requested() && function_exists('preview_email_checkout_capture')) {
+                $captured = preview_email_checkout_capture($order, (int)$oID, $currencies);
+                if ($captured !== null) {
+                    $notes[] = preview_email_const('PREVIEW_EMAIL_NOTE_EXACT_CAPTURE', 'This preview was produced by running this store\'s own order-email code and capturing exactly what it would send; no email was sent.');
+                    return [
+                        'subject' => preview_email_const('EMAIL_TEXT_SUBJECT', 'Order Confirmation') . preview_email_const('EMAIL_ORDER_NUMBER_SUBJECT', ' No: ') . $oID,
+                        'text' => $captured['text'],
+                        'block' => $captured['html'],
+                        'to_name' => (string)($order->customer['name'] ?? ''),
+                        'to_email' => (string)($order->customer['email_address'] ?? ''),
+                        'notes' => $notes,
+                    ];
+                }
+                $notes[] = preview_email_const('PREVIEW_EMAIL_NOTE_EXACT_CAPTURE_FAILED', 'The exact send-path preview could not be produced for this order, so the standard preview is shown instead.');
             }
 
             $name = $fake ? $fake['name'] : (string)$order->customer['name'];

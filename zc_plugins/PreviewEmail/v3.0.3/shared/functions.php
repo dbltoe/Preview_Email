@@ -1211,3 +1211,61 @@ function preview_email_forced_format(): string
     $f = $GLOBALS['preview_email_force_format'] ?? '';
     return ($f === 'HTML' || $f === 'TEXT') ? $f : '';
 }
+
+/*
+ * ---------------------------------------------------------------------------
+ * Exact send-path capture (opt-in; Order Confirmation only).
+ *
+ * When the admin asks for the "exact" view of the Order Confirmation, the
+ * preview is produced by running the store's own order::send_order_email()
+ * and capturing what it would send, rather than rebuilding the email here.
+ * The capture observer (admin/includes/classes/observers/auto.preview_email.php)
+ * stays inert unless capture is armed, exactly as the test-send observer stays
+ * inert unless a format is forced above. State lives in $GLOBALS so no class has
+ * to be loaded to pass it between the checkout definition and the observer.
+ * ---------------------------------------------------------------------------
+ */
+
+/** True when the admin asked for the exact send-path view of this preview. */
+function preview_email_exact_capture_requested(): bool
+{
+    return !empty($GLOBALS['preview_email_exact_capture']);
+}
+
+/** Arm capture: the observer will grab the next order email and stop its send. */
+function preview_email_capture_arm(): void
+{
+    $GLOBALS['preview_email_capture'] = ['armed' => true, 'captured' => false, 'text' => '', 'html' => []];
+}
+
+/** True while a capture is armed (read by the observer on every order email). */
+function preview_email_capture_is_armed(): bool
+{
+    return !empty($GLOBALS['preview_email_capture']['armed']);
+}
+
+/** The observer hands the finished email here (text part and HTML block array). */
+function preview_email_capture_store(string $text, array $html): void
+{
+    if (!empty($GLOBALS['preview_email_capture']['armed'])) {
+        $GLOBALS['preview_email_capture']['captured'] = true;
+        $GLOBALS['preview_email_capture']['text'] = $text;
+        $GLOBALS['preview_email_capture']['html'] = $html;
+    }
+}
+
+/** The captured email as ['text' => string, 'html' => array], or null if none. */
+function preview_email_capture_result(): ?array
+{
+    $c = $GLOBALS['preview_email_capture'] ?? null;
+    if (!is_array($c) || empty($c['captured'])) {
+        return null;
+    }
+    return ['text' => (string)$c['text'], 'html' => (array)$c['html']];
+}
+
+/** Disarm and clear capture state. */
+function preview_email_capture_disarm(): void
+{
+    unset($GLOBALS['preview_email_capture']);
+}
