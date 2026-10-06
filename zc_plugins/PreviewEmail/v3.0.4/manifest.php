@@ -31,7 +31,7 @@
  * @license  http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  */
 
-$previewEmailPluginDir = 'zc_plugins/PreviewEmail/v3.0.3/';
+$previewEmailPluginDir = 'zc_plugins/PreviewEmail/v3.0.4/';
 $previewEmailReadmeUrl = (defined('DIR_WS_CATALOG') ? DIR_WS_CATALOG : '/') . $previewEmailPluginDir . 'readme.html';
 $previewEmailGithubUrl = 'https://github.com/dbltoe/Preview_Email';
 
@@ -59,7 +59,7 @@ $previewEmailLinks =
     . '</div>';
 
 return [
-    'pluginVersion' => 'v3.0.3',
+    'pluginVersion' => 'v3.0.4',
     'pluginName' => 'Preview Email',
     'pluginDescription' =>
         'See every email your store can send, built from your own recent customers, orders and '

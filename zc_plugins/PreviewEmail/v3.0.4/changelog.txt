@@ -1,6 +1,6 @@
 Preview Email - changelog
 
-v3.0.4 (unreleased)
+v3.0.4 (2026-10-06)
 - New opt-in "HTML (Exact)" button on the Order Confirmation row. It renders the
   email by running the store's own order email code and capturing exactly what it
   would send (no email is sent), so it reflects any customization in that code. It

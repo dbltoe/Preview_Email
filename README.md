@@ -60,7 +60,7 @@ press **Install**. Details, including upgrading from 1.x/2.x, are in
   shipping definitions inside a plugin
 - [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) -- how one codebase covers
   v1.5.8 through v3.0.0, and what was verified against each release
-- `zc_plugins/PreviewEmail/v3.0.3/readme.html` -- the same material as one
+- `zc_plugins/PreviewEmail/v3.0.4/readme.html` -- the same material as one
   page, also linked from the Plugin Manager panel
 
 ## License
